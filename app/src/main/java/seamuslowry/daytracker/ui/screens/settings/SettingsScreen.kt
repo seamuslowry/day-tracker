@@ -53,6 +53,7 @@ fun SettingsScreen(
             onSetReminderTime = { scope.launch { viewModel.setReminderTime(it) } },
         )
         CalendarSection(showValues = state.showRecordedValues, onSetShowValues = { scope.launch { viewModel.setShowRecordedValues(it) } })
+        // TODO add a setting that lets the user control the size of calendars
     }
 }
 

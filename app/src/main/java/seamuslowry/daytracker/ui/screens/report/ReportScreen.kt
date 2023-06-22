@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -82,7 +83,7 @@ fun ReportScreen(
             modifier = Modifier.fillMaxWidth(),
         )
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 192.dp),
+            columns = GridCells.Adaptive(minSize = 288.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(16.dp),
@@ -200,7 +201,6 @@ fun DisplayDate(
     }
 
     Box(
-        contentAlignment = Alignment.Center,
         modifier = modifier
             .background(color)
             .fillMaxHeight()
@@ -208,29 +208,60 @@ fun DisplayDate(
                 enabled = date.date <= LocalDate.now(),
                 onClick = onSelectDate,
             ),
+        contentAlignment = Alignment.Center,
     ) {
         if (smallText != null) {
             Text(
                 text = smallText,
                 color = textColor,
                 modifier = Modifier
-                    .align(Alignment.TopStart)
                     .alpha(textAlpha)
-                    .padding(horizontal = 4.dp),
+                    .align(Alignment.TopStart)
+                    .padding(3.dp),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodySmall,
-                fontWeight = FontWeight.ExtraLight,
+                fontWeight = FontWeight.Light,
             )
         }
         if (largeText != null) {
             Text(
                 text = largeText,
                 color = textColor,
-                modifier = Modifier.alpha(textAlpha),
+                modifier = Modifier
+                    .alpha(textAlpha),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Light,
             )
         }
     }
+}
+
+@Composable
+@Preview(widthDp = 41, heightDp = 41)
+fun TestDisplayDate() {
+    DisplayDate(date = DateDisplay(value = 10, maxValue = 10, date = LocalDate.now(), inRange = true, showValue = true))
+}
+
+@Composable
+@Preview(widthDp = 25, heightDp = 25)
+fun SmallDisplayDate() {
+    DisplayDate(date = DateDisplay(value = 10, maxValue = 10, date = LocalDate.now(), inRange = true, showValue = true))
+}
+
+@Composable
+@Preview(widthDp = 29, heightDp = 29)
+fun CarolineDisplayDate() {
+    DisplayDate(date = DateDisplay(value = 10, maxValue = 10, date = LocalDate.now().withDayOfMonth(22), inRange = true, showValue = true))
+}
+
+@Composable
+@Preview(widthDp = 50, heightDp = 50)
+fun NormalDisplayDate() {
+    DisplayDate(date = DateDisplay(value = 10, maxValue = 10, date = LocalDate.now(), inRange = true, showValue = true))
+}
+
+@Composable
+@Preview(widthDp = 50, heightDp = 50)
+fun NormalNoValueDisplayDate() {
+    DisplayDate(date = DateDisplay(value = 10, maxValue = 10, date = LocalDate.now(), inRange = true, showValue = false))
 }
