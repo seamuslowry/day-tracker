@@ -18,6 +18,8 @@ import seamuslowry.daytracker.data.repos.ItemRepo
 import seamuslowry.daytracker.data.repos.SettingsRepo
 import seamuslowry.daytracker.models.Item
 import seamuslowry.daytracker.models.ItemConfiguration
+import seamuslowry.daytracker.ui.shared.DateDisplay
+import seamuslowry.daytracker.ui.shared.mapToCalendarStructure
 import java.time.LocalDate
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
@@ -63,27 +65,7 @@ class ReportViewModel @Inject constructor(
 
     val displayItems: StateFlow<Map<ItemConfiguration, List<List<DateDisplay>>>> = combine(state, items, showRecordedValues) {
             s, i, srv ->
-        val dayOfWeekField = WeekFields.of(Locale.getDefault()).dayOfWeek()
-        val range = s.dateRange.start.range(dayOfWeekField)
-        val blanksFrom = s.dateRange.start.with(dayOfWeekField, range.minimum)
-        val blanksTo = s.dateRange.endInclusive.with(dayOfWeekField, range.maximum)
-        val baseDate = DateDisplay(showValue = srv, date = s.anchorDate)
-
-        val startingBlanks = List(ChronoUnit.DAYS.between(blanksFrom, s.dateRange.start).toInt()) { baseDate.copy(date = s.dateRange.start.minusDays(it.toLong() + 1), inRange = false) }.reversed()
-        val endingBlanks = List(ChronoUnit.DAYS.between(s.dateRange.endInclusive, blanksTo).toInt()) { baseDate.copy(date = s.dateRange.endInclusive.plusDays(it.toLong() + 1), inRange = false) }
-
-        val sequence = generateSequence(s.dateRange.start) { it.plusDays(1) }.takeWhile { it <= s.dateRange.endInclusive }
-
-        i.mapValues { entry ->
-            val sequenceDisplays = sequence.map { date ->
-                entry.value.firstOrNull { item -> item.date == date }?.let { item ->
-                    val selection = entry.key.trackingType.options.firstOrNull { it.value == item.value }
-                    baseDate.copy(value = item.value, text = selection?.shortText, maxValue = entry.key.trackingType.options.size, date = date)
-                } ?: baseDate.copy(date = date)
-            }.toList()
-
-            (startingBlanks + sequenceDisplays + endingBlanks).chunked(range.maximum.toInt())
-        }
+        mapToCalendarStructure(s.dateRange, i, srv)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
@@ -111,15 +93,6 @@ enum class DisplayOption(@StringRes val label: Int, val field: (locale: Locale) 
     MONTH(R.string.display_month, { ChronoField.DAY_OF_MONTH }, ChronoUnit.MONTHS),
     WEEK(R.string.display_week, { WeekFields.of(it).dayOfWeek() }, ChronoUnit.WEEKS),
 }
-
-data class DateDisplay(
-    val value: Int? = null,
-    @StringRes val text: Int? = null,
-    val maxValue: Int? = null,
-    val date: LocalDate,
-    val inRange: Boolean = true,
-    val showValue: Boolean = false,
-)
 
 data class ReportState(
     val selectedOption: DisplayOption = DisplayOption.MONTH,

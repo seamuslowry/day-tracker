@@ -19,14 +19,14 @@ spotless {
 
 android {
     namespace 'seamuslowry.daytracker'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "seamuslowry.daytracker"
         minSdk 33
-        targetSdk 33
-        versionCode 17
-        versionName "0.23.1"
+        targetSdk 34
+        versionCode 18
+        versionName "0.23.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -100,7 +100,7 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-test-manifest"
 }
 
-task printVersionName {
+tasks.register('printVersionName') {
     doLast {
         println android.defaultConfig.versionName
     }

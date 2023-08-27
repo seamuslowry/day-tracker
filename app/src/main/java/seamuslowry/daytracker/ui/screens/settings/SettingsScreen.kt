@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -27,6 +28,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -34,8 +36,13 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import seamuslowry.daytracker.R
+import seamuslowry.daytracker.models.ItemConfiguration
 import seamuslowry.daytracker.models.localeFormat
+import seamuslowry.daytracker.ui.shared.CalendarGrid
+import seamuslowry.daytracker.ui.shared.mapToCalendarStructure
+import java.time.LocalDate
 import java.time.LocalTime
+import java.time.temporal.ChronoField
 
 @Composable
 fun SettingsScreen(
@@ -52,7 +59,12 @@ fun SettingsScreen(
             onSetReminderEnabled = { scope.launch { viewModel.setReminderEnabled(it) } },
             onSetReminderTime = { scope.launch { viewModel.setReminderTime(it) } },
         )
-        CalendarSection(showValues = state.showRecordedValues, onSetShowValues = { scope.launch { viewModel.setShowRecordedValues(it) } })
+        CalendarSection(
+            showValues = state.showRecordedValues,
+            onSetShowValues = { scope.launch { viewModel.setShowRecordedValues(it) } },
+            minCalendarSize = state.minCalendarSize,
+            onSetMinCalendarSize = { scope.launch { viewModel.setMinCalendarSize(it) } },
+        )
     }
 }
 
@@ -60,13 +72,44 @@ fun SettingsScreen(
 fun CalendarSection(
     showValues: Boolean,
     onSetShowValues: (value: Boolean) -> Unit,
+    minCalendarSize: Float?,
+    onSetMinCalendarSize: (value: Float) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val calendarSizeRange = 200f..500f
+
+    val screenWidth = LocalConfiguration.current.screenWidthDp
+    val columns = minCalendarSize?.let { (screenWidth / it).toInt() + 1 } ?: 1
+
+    val now = LocalDate.now()
+    val range = now.range(ChronoField.DAY_OF_MONTH)
+    val dateRange = now.withDayOfMonth(range.minimum.toInt())..now.withDayOfMonth(range.maximum.toInt())
+
+    val calendars = mapToCalendarStructure(
+        dateRange,
+        (0..columns).associate { calenderIndex ->
+            ItemConfiguration(id = calenderIndex.toLong(), name = calenderIndex.toString()) to listOf() // TODO transform dateRange to list of Items
+        },
+        false,
+    )
+
+    val calendarSize = (minCalendarSize ?: 0f).coerceAtLeast(calendarSizeRange.start)
+
     Column(modifier = modifier) {
         Text(text = stringResource(R.string.calendar_section_title), modifier = Modifier.padding(vertical = 8.dp), style = MaterialTheme.typography.headlineSmall)
         Row(modifier = Modifier.fillMaxWidth().padding(top = 4.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
             Text(text = stringResource(R.string.show_recorded_values))
             Switch(checked = showValues, onCheckedChange = onSetShowValues)
+        }
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Text(text = "Minimum Calendar Size")
+            Slider(value = calendarSize, onValueChange = onSetMinCalendarSize, valueRange = calendarSizeRange)
+            CalendarGrid(
+                groupedItems = calendars,
+                onSelectDate = {},
+                minCalendarSize = calendarSize.dp,
+                spacing = 16.dp,
+            )
         }
     }
 }

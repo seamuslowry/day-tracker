@@ -39,6 +39,10 @@ class SettingsViewModel @Inject constructor(
         settingsRepo.setShowRecordedValues(value)
     }
 
+    suspend fun setMinCalendarSize(value: Float) {
+        settingsRepo.setMinCalendarSize(value)
+    }
+
     private fun scheduleReminder(time: LocalTime) {
         workManager.scheduleReminderWorker(time)
     }
