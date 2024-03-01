@@ -18,6 +18,7 @@ import seamuslowry.daytracker.data.repos.ItemRepo
 import seamuslowry.daytracker.data.repos.SettingsRepo
 import seamuslowry.daytracker.models.Item
 import seamuslowry.daytracker.models.ItemConfiguration
+import seamuslowry.daytracker.models.LimitedOptionTrackingType
 import java.time.LocalDate
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
@@ -74,16 +75,19 @@ class ReportViewModel @Inject constructor(
 
         val sequence = generateSequence(s.dateRange.start) { it.plusDays(1) }.takeWhile { it <= s.dateRange.endInclusive }
 
-        i.mapValues { entry ->
-            val sequenceDisplays = sequence.map { date ->
-                entry.value.firstOrNull { item -> item.date == date }?.let { item ->
-                    val selection = entry.key.trackingType.options.firstOrNull { it.value == item.value }
-                    baseDate.copy(value = item.value, text = selection?.shortText, maxValue = entry.key.trackingType.options.size, date = date)
-                } ?: baseDate.copy(date = date)
-            }.toList()
+        i
+            .filterKeys { it.trackingType is LimitedOptionTrackingType }
+            .mapValues { entry ->
+                val sequenceDisplays = sequence.map { date ->
+                    entry.value.firstOrNull { item -> item.date == date }?.let { item ->
+                        val trackingType = entry.key.trackingType as LimitedOptionTrackingType
+                        val selection = trackingType.options.firstOrNull { it.value == item.value }
+                        baseDate.copy(value = item.value, text = selection?.shortText, maxValue = trackingType.options.size, date = date)
+                    } ?: baseDate.copy(date = date)
+                }.toList()
 
-            (startingBlanks + sequenceDisplays + endingBlanks).chunked(range.maximum.toInt())
-        }
+                (startingBlanks + sequenceDisplays + endingBlanks).chunked(range.maximum.toInt())
+            }
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),

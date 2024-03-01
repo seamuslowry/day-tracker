@@ -8,6 +8,6 @@ data class ItemConfiguration(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val name: String = "",
-    val trackingType: TrackingType = TrackingType.ONE_TO_TEN,
+    val trackingType: TrackingType = LimitedOptionTrackingType.ONE_TO_TEN,
     val active: Boolean = true,
 )

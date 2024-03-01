@@ -6,6 +6,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
@@ -17,7 +18,7 @@ fun <T> SegmentedButtons(
     enabled: Boolean = true,
     buttonContent: @Composable (value: T) -> Unit,
 ) {
-    Row(modifier = modifier) {
+    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         values.forEach {
             val startPercentage = if (it == values.first()) 50 else 0
             val endPercentage = if (it == values.last()) 50 else 0

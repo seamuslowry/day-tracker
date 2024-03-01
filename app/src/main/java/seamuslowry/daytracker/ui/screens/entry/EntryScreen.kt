@@ -54,11 +54,18 @@ import seamuslowry.daytracker.R
 import seamuslowry.daytracker.models.Item
 import seamuslowry.daytracker.models.ItemConfiguration
 import seamuslowry.daytracker.models.ItemWithConfiguration
-import seamuslowry.daytracker.models.TrackingType
+import seamuslowry.daytracker.models.LimitedOptionTrackingType
+import seamuslowry.daytracker.models.TextEntryTrackingType
 import seamuslowry.daytracker.models.localeFormat
 import seamuslowry.daytracker.ui.shared.ArrowPicker
 import seamuslowry.daytracker.ui.shared.TrackerEntry
 import java.time.LocalDate
+
+val SUPPORTED_TRACKING_TYPES = listOf(
+    LimitedOptionTrackingType.ONE_TO_TEN,
+    LimitedOptionTrackingType.YES_NO,
+    TextEntryTrackingType,
+)
 
 @Composable
 fun EntryScreen(
@@ -316,17 +323,17 @@ fun AddConfigurationContent(
         }
     }
     ArrowPicker(
-        value = itemConfiguration.trackingType.ordinal.toLong(),
+        value = SUPPORTED_TRACKING_TYPES.indexOf(itemConfiguration.trackingType).toLong(),
         onChange = {
-            onChange(itemConfiguration.copy(trackingType = TrackingType.entries[it.toInt()]))
+            onChange(itemConfiguration.copy(trackingType = SUPPORTED_TRACKING_TYPES[it.toInt()]))
         },
-        range = LongRange(0, (TrackingType.entries.size - 1).toLong()),
+        range = LongRange(0, (SUPPORTED_TRACKING_TYPES.size - 1).toLong()),
         modifier = Modifier.padding(5.dp),
         incrementResource = R.string.change_tracking_type,
         decrementResource = R.string.change_tracking_type,
     ) {
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-            TrackerEntry(trackerType = TrackingType.entries[it.toInt()], enabled = false)
+            TrackerEntry(trackerType = SUPPORTED_TRACKING_TYPES[it.toInt()], enabled = false)
         }
     }
     Button(
