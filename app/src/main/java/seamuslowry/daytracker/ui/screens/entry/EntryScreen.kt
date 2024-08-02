@@ -31,6 +31,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -100,6 +101,7 @@ fun EntryScreen(
                 itemWithConfiguration = it,
                 onChange = viewModel::saveItem,
                 onDelete = viewModel::deleteConfiguration,
+                onEdit = viewModel::saveItemConfiguration,
             )
         }
         items(itemsLoading.coerceAtLeast(0)) {
@@ -126,9 +128,18 @@ fun ItemEntry(
     itemWithConfiguration: ItemWithConfiguration? = null,
     onChange: (item: Item) -> Unit = {},
     onDelete: (itemConfiguration: ItemConfiguration) -> Unit = {},
+    onEdit: (itemConfiguration: ItemConfiguration) -> Unit = {},
 ) {
     val item = itemWithConfiguration?.item
     val configuration = itemWithConfiguration?.configuration ?: ItemConfiguration()
+
+    var editingConfiguration: ItemConfiguration? by remember {
+        mutableStateOf(null)
+    }
+
+    LaunchedEffect(key1 = configuration) {
+        editingConfiguration = null
+    }
 
     Card(
         modifier = modifier
@@ -137,31 +148,48 @@ fun ItemEntry(
                 visible = itemWithConfiguration == null,
                 highlight = PlaceholderHighlight.fade(),
                 color = MaterialTheme.colorScheme.surfaceVariant,
-            ),
+            )
+            .animateContentSize(),
     ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth().padding(start = 25.dp, top = 10.dp),
-        ) {
-            Text(text = configuration.name.ifEmpty { stringResource(R.string.default_name) })
-            ItemEntryMenu(onEvent = {
-                when (it) {
-                    ItemEntryMenuAction.DELETE -> onDelete(configuration)
-                }
-            })
+        editingConfiguration?.let {
+            UpsertConfigurationContent(
+                itemConfiguration = it,
+                onChange = { newConfiguration -> editingConfiguration = newConfiguration },
+                onSave = { onEdit(it) },
+                onDiscard = { editingConfiguration = null },
+                disableSave = configuration == editingConfiguration,
+            )
+        } ?: run {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 25.dp, top = 10.dp),
+            ) {
+                Text(text = configuration.name.ifEmpty { stringResource(R.string.default_name) })
+                ItemEntryMenu(onEvent = {
+                    when (it) {
+                        ItemEntryMenuAction.DELETE -> onDelete(configuration)
+                        ItemEntryMenuAction.EDIT -> {
+                            editingConfiguration = configuration
+                        }
+                    }
+                })
+            }
+            TrackerEntry(
+                trackerType = configuration.trackingType,
+                item = item,
+                onChange = onChange,
+                modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
+            )
         }
-        TrackerEntry(
-            trackerType = configuration.trackingType,
-            item = item,
-            onChange = onChange,
-            modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
-        )
     }
 }
 
 enum class ItemEntryMenuAction {
     DELETE,
+    EDIT,
 }
 
 @Composable
@@ -220,6 +248,13 @@ fun ItemEntryMenu(
             modifier = modifier,
         ) {
             DropdownMenuItem(
+                text = { Text(stringResource(R.string.edit)) },
+                onClick = {
+                    expanded = false
+                    onEvent(ItemEntryMenuAction.EDIT)
+                },
+            )
+            DropdownMenuItem(
                 text = { Text(stringResource(R.string.delete)) },
                 onClick = {
                     expanded = false
@@ -258,7 +293,9 @@ fun AddConfigurationButton(
 
     Box(
         contentAlignment = Alignment.TopCenter,
-        modifier = modifier.padding(20.dp).fillMaxWidth(),
+        modifier = modifier
+            .padding(20.dp)
+            .fillMaxWidth(),
     ) {
         Card(
             colors = CardDefaults.cardColors(containerColor = cardColor),
@@ -285,7 +322,7 @@ fun AddConfigurationButton(
                         )
                     }
                 } else {
-                    AddConfigurationContent(
+                    UpsertConfigurationContent(
                         itemConfiguration = itemConfiguration,
                         onChange = onChange,
                         onSave = onSave,
@@ -298,12 +335,16 @@ fun AddConfigurationButton(
 }
 
 @Composable
-fun AddConfigurationContent(
+fun UpsertConfigurationContent(
     itemConfiguration: ItemConfiguration,
     onChange: (itemConfiguration: ItemConfiguration) -> Unit,
     onSave: () -> Unit,
     onDiscard: () -> Unit,
+    disableSave: Boolean = false,
 ) {
+    val creating = itemConfiguration.id == 0L
+    val currentTrackingTypeIndex = SUPPORTED_TRACKING_TYPES.indexOf(itemConfiguration.trackingType).toLong()
+
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
@@ -312,7 +353,9 @@ fun AddConfigurationContent(
         OutlinedTextField(
             value = itemConfiguration.name,
             onValueChange = { onChange(itemConfiguration.copy(name = it)) },
-            modifier = Modifier.weight(1f).padding(end = 5.dp),
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 5.dp),
             label = { Text(text = stringResource(R.string.name)) },
         )
         IconButton(onClick = onDiscard) {
@@ -323,11 +366,11 @@ fun AddConfigurationContent(
         }
     }
     ArrowPicker(
-        value = SUPPORTED_TRACKING_TYPES.indexOf(itemConfiguration.trackingType).toLong(),
+        value = currentTrackingTypeIndex,
         onChange = {
             onChange(itemConfiguration.copy(trackingType = SUPPORTED_TRACKING_TYPES[it.toInt()]))
         },
-        range = LongRange(0, (SUPPORTED_TRACKING_TYPES.size - 1).toLong()),
+        range = if (creating) LongRange(0, (SUPPORTED_TRACKING_TYPES.size - 1).toLong()) else LongRange(currentTrackingTypeIndex, currentTrackingTypeIndex),
         modifier = Modifier.padding(5.dp),
         incrementResource = R.string.change_tracking_type,
         decrementResource = R.string.change_tracking_type,
@@ -337,9 +380,11 @@ fun AddConfigurationContent(
         }
     }
     Button(
-        enabled = itemConfiguration.name.isNotBlank(),
+        enabled = !disableSave && itemConfiguration.name.isNotBlank(),
         onClick = onSave,
-        modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
     ) {
         Text(
             text = stringResource(R.string.confirm_configuration),

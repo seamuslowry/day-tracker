@@ -16,6 +16,7 @@
     <string name="tracker_options">Tracker Options</string>
     <string name="default_name">Default</string>
     <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
     <string name="confirm_deletion">Confirm Deletion</string>
     <string name="confirm_deletion_detail">Deleting this tracked item will delete all tracked items of this type.</string>
     <string name="confirm">Confirm</string>

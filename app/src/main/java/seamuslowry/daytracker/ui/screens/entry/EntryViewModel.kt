@@ -120,6 +120,10 @@ class EntryViewModel @Inject constructor(
         runBlocking { itemRepo.save(item) }
     }
 
+    fun saveItemConfiguration(itemConfiguration: ItemConfiguration) {
+        runBlocking { itemConfigurationRepo.save(itemConfiguration) }
+    }
+
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
