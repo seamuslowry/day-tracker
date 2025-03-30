@@ -33,6 +33,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -49,6 +50,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -371,6 +374,7 @@ fun UpsertConfigurationContent(
 ) {
     val creating = itemConfiguration.id == 0L
     val currentTrackingTypeIndex = SUPPORTED_TRACKING_TYPES.indexOf(itemConfiguration.trackingType).toLong()
+    val reverseColorsText = stringResource(R.string.reverse_colors)
 
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -391,6 +395,16 @@ fun UpsertConfigurationContent(
                 contentDescription = stringResource(R.string.discard_configuration),
             )
         }
+    }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 20.dp, end = 10.dp, top = 5.dp, bottom = 5.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(text = reverseColorsText)
+        Switch(checked = itemConfiguration.reverseColor, onCheckedChange = { onChange(itemConfiguration.copy(reverseColor = it)) }, modifier = Modifier.semantics { contentDescription = reverseColorsText })
     }
     ArrowPicker(
         value = currentTrackingTypeIndex,
