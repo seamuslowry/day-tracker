@@ -11,6 +11,7 @@ data class ItemConfiguration(
     val name: String = "",
     val trackingType: TrackingType = LimitedOptionTrackingType.ONE_TO_TEN,
     val active: Boolean = true,
+    val reverseColor: Boolean = false,
     val orderOverride: Long? = null,
     val lastModified: Instant = Instant.now(),
 ) : Comparable<ItemConfiguration> {
