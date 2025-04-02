@@ -2,7 +2,6 @@ package seamuslowry.daytracker.ui.screens.settings
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.graphics.Color.parseColor
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -51,6 +50,7 @@ import seamuslowry.daytracker.R
 import seamuslowry.daytracker.models.localeFormat
 import seamuslowry.daytracker.models.toHexString
 import java.time.LocalTime
+import androidx.core.graphics.toColorInt
 
 @Composable
 fun SettingsScreen(
@@ -235,7 +235,7 @@ private fun ColorTextField(
 
     LaunchedEffect(key1 = textColor) {
         try {
-            onColorChange(Color(parseColor("#$textColor")))
+            onColorChange(Color("#$textColor".toColorInt()))
         } catch (_: Exception) { }
     }
 

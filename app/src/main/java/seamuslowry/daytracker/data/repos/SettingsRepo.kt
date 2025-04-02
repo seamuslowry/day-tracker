@@ -62,20 +62,20 @@ class SettingsRepo @Inject constructor(@ApplicationContext private val context: 
     val settings: Flow<Settings> = context.dataStore.data
         .map {
             Settings(
-                reminderEnabled = it[REMINDER_ENABLED] ?: false,
+                reminderEnabled = it[REMINDER_ENABLED] == true,
                 reminderTime = it[REMINDER_TIME]?.let { time -> LocalTime.parse(time) } ?: LocalTime.of(18, 0),
-                showRecordedValues = it[SHOW_RECORDED_VALUES] ?: false,
+                showRecordedValues = it[SHOW_RECORDED_VALUES] == true,
                 lowValueColor = it[LOW_VALUE_COLOR]?.let { colorInt ->
                     try {
                         Color(colorInt)
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
                         null
                     }
                 },
                 highValueColor = it[HIGH_VALUE_COLOR]?.let { colorInt ->
                     try {
                         Color(colorInt)
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
                         null
                     }
                 },
