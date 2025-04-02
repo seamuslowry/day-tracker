@@ -174,8 +174,10 @@ fun DisplayDate(
     colorOverrides: DisplayColors = DisplayColors(null, null),
     onSelectDate: () -> Unit = {},
 ) {
-    val lowColor = colorOverrides.lowValueColor ?: MaterialTheme.colorScheme.error
-    val highColor = colorOverrides.highValueColor ?: MaterialTheme.colorScheme.primary
+    val flipConfigurationAgnosticLowColor = colorOverrides.lowValueColor ?: MaterialTheme.colorScheme.error
+    val flipConfigurationAgnosticHighColor = colorOverrides.highValueColor ?: MaterialTheme.colorScheme.primary
+
+    val (lowColor, highColor) = if (date.reverseColor) flipConfigurationAgnosticHighColor to flipConfigurationAgnosticLowColor else flipConfigurationAgnosticLowColor to flipConfigurationAgnosticHighColor
 
     val color = when {
         !date.inRange -> Color.Transparent

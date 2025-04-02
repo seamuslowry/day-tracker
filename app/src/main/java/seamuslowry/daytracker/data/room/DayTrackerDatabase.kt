@@ -8,7 +8,7 @@ import seamuslowry.daytracker.data.room.daos.ItemDao
 import seamuslowry.daytracker.models.Item
 import seamuslowry.daytracker.models.ItemConfiguration
 
-@Database(entities = [Item::class, ItemConfiguration::class], version = 8, exportSchema = false)
+@Database(entities = [Item::class, ItemConfiguration::class], version = 9, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class DayTrackerDatabase : RoomDatabase() {
     abstract fun itemDao(): ItemDao

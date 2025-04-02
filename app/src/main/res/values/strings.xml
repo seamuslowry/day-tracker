@@ -47,4 +47,5 @@
     <string name="one_to_ten">One to Ten</string>
     <string name="yes_no">Yes or No</string>
     <string name="free_text">Free Text</string>
+    <string name="reverse_colors">Reverse colors in report view</string>
 </resources>

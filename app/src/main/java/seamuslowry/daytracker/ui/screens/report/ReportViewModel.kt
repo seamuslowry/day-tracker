@@ -91,8 +91,9 @@ class ReportViewModel @Inject constructor(
                 val sequenceDisplays = sequence.map { date ->
                     entry.value.firstOrNull { item -> item.date == date }?.let { item ->
                         val trackingType = entry.key.trackingType as LimitedOptionTrackingType
+                        val reverseColor = entry.key.reverseColor
                         val selection = trackingType.options.firstOrNull { it.value == item.value }
-                        baseDate.copy(value = item.value, text = selection?.shortText, maxValue = trackingType.options.size, date = date)
+                        baseDate.copy(value = item.value, text = selection?.shortText, maxValue = trackingType.options.size, date = date, reverseColor = reverseColor)
                     } ?: baseDate.copy(date = date)
                 }.toList()
 
@@ -133,6 +134,7 @@ data class DateDisplay(
     val date: LocalDate,
     val inRange: Boolean = true,
     val showValue: Boolean = false,
+    val reverseColor: Boolean = false,
 )
 
 data class DisplayColors(
