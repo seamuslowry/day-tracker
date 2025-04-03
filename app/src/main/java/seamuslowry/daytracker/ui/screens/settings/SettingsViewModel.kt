@@ -40,14 +40,6 @@ class SettingsViewModel @Inject constructor(
         settingsRepo.setShowRecordedValues(value)
     }
 
-    suspend fun setLowValueColor(color: Color) {
-        settingsRepo.setLowValueColor(color)
-    }
-
-    suspend fun setHighValueColor(color: Color) {
-        settingsRepo.setHighValueColor(color)
-    }
-
     private fun scheduleReminder(time: LocalTime) {
         scheduler.scheduleReminder(time)
     }

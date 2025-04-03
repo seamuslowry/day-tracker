@@ -46,14 +46,6 @@ class ReportViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5_000),
     )
 
-    val colorOverrides: StateFlow<DisplayColors> = settingsRepo.settings.map {
-        DisplayColors(it.lowValueColor, it.highValueColor)
-    }.stateIn(
-        scope = viewModelScope,
-        initialValue = runBlocking { settingsRepo.settings.first().let { DisplayColors(it.lowValueColor, it.highValueColor) } },
-        started = SharingStarted.WhileSubscribed(5_000),
-    )
-
     val earliestDate: StateFlow<LocalDate> = itemRepo.getEarliest()
         .stateIn(
             scope = viewModelScope,
@@ -90,9 +82,16 @@ class ReportViewModel @Inject constructor(
             .mapValues { entry ->
                 val sequenceDisplays = sequence.map { date ->
                     entry.value.firstOrNull { item -> item.date == date }?.let { item ->
-                        val trackingType = entry.key.trackingType as LimitedOptionTrackingType
+                        val itemConfiguration = entry.key
+                        val trackingType = itemConfiguration.trackingType as LimitedOptionTrackingType
                         val selection = trackingType.options.firstOrNull { it.value == item.value }
-                        baseDate.copy(value = item.value, text = selection?.shortText, maxValue = trackingType.options.size, date = date)
+                        baseDate.copy(
+                            value = item.value,
+                            text = selection?.shortText,
+                            maxValue = trackingType.options.size,
+                            date = date,
+                            colorOverrides = DisplayColors(lowValueColor = itemConfiguration.lowColor, highValueColor = itemConfiguration.highColor),
+                        )
                     } ?: baseDate.copy(date = date)
                 }.toList()
 
@@ -133,6 +132,7 @@ data class DateDisplay(
     val date: LocalDate,
     val inRange: Boolean = true,
     val showValue: Boolean = false,
+    val colorOverrides: DisplayColors = DisplayColors(null, null),
 )
 
 data class DisplayColors(

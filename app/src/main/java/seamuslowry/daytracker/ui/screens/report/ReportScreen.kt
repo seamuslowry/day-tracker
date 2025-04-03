@@ -54,7 +54,6 @@ fun ReportScreen(
     viewModel: ReportViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
-    val colorOverrides by viewModel.colorOverrides.collectAsState()
     val groupedItems by viewModel.displayItems.collectAsState()
     val earliestDate by viewModel.earliestDate.collectAsState()
     val selectedOptionSingularText = stringResource(state.selectedOption.singular)
@@ -91,7 +90,7 @@ fun ReportScreen(
             contentPadding = PaddingValues(16.dp),
         ) {
             items(items = groupedItems.entries.toList(), key = { it.key.id }) {
-                DisplayDates(entry = it, onSelectDate = onSelectDate, colorOverrides = colorOverrides)
+                DisplayDates(entry = it, onSelectDate = onSelectDate)
             }
         }
     }
@@ -115,7 +114,6 @@ fun DisplaySelection(
 fun DisplayDates(
     entry: Map.Entry<ItemConfiguration, List<List<DateDisplay>>>,
     modifier: Modifier = Modifier,
-    colorOverrides: DisplayColors = DisplayColors(null, null),
     onSelectDate: (d: LocalDate) -> Unit = {},
 ) {
     Card(modifier = modifier) {
@@ -158,7 +156,6 @@ fun DisplayDates(
                             date = it,
                             modifier = Modifier.weight(1f),
                             onSelectDate = { onSelectDate(it.date) },
-                            colorOverrides = colorOverrides,
                         )
                     }
                 }
@@ -171,11 +168,10 @@ fun DisplayDates(
 fun DisplayDate(
     date: DateDisplay,
     modifier: Modifier = Modifier,
-    colorOverrides: DisplayColors = DisplayColors(null, null),
     onSelectDate: () -> Unit = {},
 ) {
-    val lowColor = colorOverrides.lowValueColor ?: MaterialTheme.colorScheme.error
-    val highColor = colorOverrides.highValueColor ?: MaterialTheme.colorScheme.primary
+    val lowColor = date.colorOverrides.lowValueColor ?: MaterialTheme.colorScheme.error
+    val highColor = date.colorOverrides.highValueColor ?: MaterialTheme.colorScheme.primary
 
     val color = when {
         !date.inRange -> Color.Transparent

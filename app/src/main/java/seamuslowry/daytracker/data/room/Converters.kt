@@ -1,7 +1,5 @@
 package seamuslowry.daytracker.data.room
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.room.TypeConverter
 import seamuslowry.daytracker.models.LimitedOptionTrackingType
 import seamuslowry.daytracker.models.TextEntryTrackingType
