@@ -27,7 +27,7 @@ object DbModule {
         .addMigrations(
             MIGRATION_6_7,
             MIGRATION_7_8,
-            MIGRATION_8_9
+            MIGRATION_8_9,
         )
         .build()
 
