@@ -28,8 +28,8 @@ android {
         applicationId "seamuslowry.daytracker"
         minSdk 33
         targetSdk 35
-        versionCode 55
-        versionName "0.31.17"
+        versionCode 56
+        versionName "0.31.18"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary true
