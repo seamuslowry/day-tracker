@@ -24,13 +24,6 @@ class Converters {
     @TypeConverter
     fun localDateToEpochDay(date: LocalDate?): Long? = date?.toEpochDay()
 
-    // Color conversions
-    @TypeConverter
-    fun argbToColor(value: Int?): Color? = value?.let { Color(value) }
-
-    @TypeConverter
-    fun colorToArgb(color: Color?): Int? = color?.toArgb()
-
     // TrackingType conversions
     @TypeConverter
     fun stringToTrackingType(value: String?): TrackingType? = when {
