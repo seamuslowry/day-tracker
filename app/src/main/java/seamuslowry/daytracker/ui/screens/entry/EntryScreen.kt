@@ -5,6 +5,8 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,10 +16,12 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
@@ -49,9 +53,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.toColorInt
 import androidx.hilt.navigation.compose.hiltViewModel
 import io.github.fornewid.placeholder.foundation.PlaceholderHighlight
 import io.github.fornewid.placeholder.material3.fade
@@ -64,6 +70,7 @@ import seamuslowry.daytracker.models.ItemWithConfiguration
 import seamuslowry.daytracker.models.LimitedOptionTrackingType
 import seamuslowry.daytracker.models.TextEntryTrackingType
 import seamuslowry.daytracker.models.localeFormat
+import seamuslowry.daytracker.models.toHexString
 import seamuslowry.daytracker.ui.shared.ArrowPicker
 import seamuslowry.daytracker.ui.shared.TrackerEntry
 import sh.calvin.reorderable.ReorderableItem
@@ -394,6 +401,34 @@ fun UpsertConfigurationContent(
             )
         }
     }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 30.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(text = stringResource(R.string.low_color), modifier = Modifier.weight(1f))
+        ColorTextField(
+            color = itemConfiguration.lowColor ?: MaterialTheme.colorScheme.error,
+            onColorChange = { onChange(itemConfiguration.copy(lowColorArgb = it.toArgb())) },
+            modifier = Modifier.weight(1f),
+        )
+    }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 30.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(text = stringResource(R.string.high_color), modifier = Modifier.weight(1f))
+        ColorTextField(
+            color = itemConfiguration.highColor ?: MaterialTheme.colorScheme.primary,
+            onColorChange = { onChange(itemConfiguration.copy(highColorArgb = it.toArgb())) },
+            modifier = Modifier.weight(1f),
+        )
+    }
     ArrowPicker(
         value = currentTrackingTypeIndex,
         onChange = {
@@ -420,4 +455,45 @@ fun UpsertConfigurationContent(
             modifier = Modifier.padding(0.dp),
         )
     }
+}
+
+@Composable
+private fun ColorTextField(
+    color: Color,
+    onColorChange: (c: Color) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var textColor by remember { mutableStateOf(color.toHexString()) }
+
+    LaunchedEffect(key1 = textColor) {
+        try {
+            onColorChange(Color("#$textColor".toColorInt()))
+        } catch (_: Exception) { }
+    }
+
+    LaunchedEffect(key1 = color) {
+        textColor = color.toHexString()
+    }
+
+    OutlinedTextField(
+        value = textColor,
+        onValueChange = { textColor = it.uppercase().take(6) },
+        modifier = modifier,
+        prefix = { Text(text = stringResource(R.string.hex_prefix)) },
+        trailingIcon = {
+            Box(
+                modifier = Modifier
+                    .size(24.dp)
+                    .background(
+                        color = if (color.toHexString() == textColor) color else Color.Unspecified,
+                        shape = CircleShape,
+                    )
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.outline,
+                        shape = CircleShape,
+                    ),
+            )
+        },
+    )
 }
