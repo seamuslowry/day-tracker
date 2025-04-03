@@ -1,5 +1,7 @@
 package seamuslowry.daytracker.data.room
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.room.TypeConverter
 import seamuslowry.daytracker.models.LimitedOptionTrackingType
 import seamuslowry.daytracker.models.TextEntryTrackingType
@@ -21,6 +23,13 @@ class Converters {
 
     @TypeConverter
     fun localDateToEpochDay(date: LocalDate?): Long? = date?.toEpochDay()
+
+    // Color conversions
+    @TypeConverter
+    fun argbToColor(value: Int?): Color? = value?.let { Color(value) }
+
+    @TypeConverter
+    fun colorToArgb(color: Color?): Int? = color?.toArgb()
 
     // TrackingType conversions
     @TypeConverter
