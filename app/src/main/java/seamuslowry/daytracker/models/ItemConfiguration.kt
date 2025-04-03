@@ -1,5 +1,6 @@
 package seamuslowry.daytracker.models
 
+import androidx.compose.ui.graphics.Color
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.time.Instant
@@ -11,6 +12,8 @@ data class ItemConfiguration(
     val name: String = "",
     val trackingType: TrackingType = LimitedOptionTrackingType.ONE_TO_TEN,
     val active: Boolean = true,
+    val highColor: Color? = null,
+    val lowColor: Color? = null,
     val orderOverride: Long? = null,
     val lastModified: Instant = Instant.now(),
 ) : Comparable<ItemConfiguration> {

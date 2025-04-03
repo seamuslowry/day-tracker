@@ -10,6 +10,7 @@ import dagger.hilt.components.SingletonComponent
 import seamuslowry.daytracker.data.room.DayTrackerDatabase
 import seamuslowry.daytracker.data.room.MIGRATION_6_7
 import seamuslowry.daytracker.data.room.MIGRATION_7_8
+import seamuslowry.daytracker.data.room.MIGRATION_8_9
 import seamuslowry.daytracker.data.room.daos.ItemConfigurationDao
 import seamuslowry.daytracker.data.room.daos.ItemDao
 import javax.inject.Singleton
@@ -23,8 +24,11 @@ object DbModule {
         @ApplicationContext context: Context,
     ): DayTrackerDatabase = Room
         .databaseBuilder(context, DayTrackerDatabase::class.java, "day_tracker_database")
-        .addMigrations(MIGRATION_6_7)
-        .addMigrations(MIGRATION_7_8)
+        .addMigrations(
+            MIGRATION_6_7,
+            MIGRATION_7_8,
+            MIGRATION_8_9
+        )
         .build()
 
     @Provides
