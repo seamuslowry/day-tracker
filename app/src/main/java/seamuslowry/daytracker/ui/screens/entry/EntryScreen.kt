@@ -52,6 +52,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
@@ -380,6 +381,8 @@ fun UpsertConfigurationContent(
 ) {
     val creating = itemConfiguration.id == 0L
     val currentTrackingTypeIndex = SUPPORTED_TRACKING_TYPES.indexOf(itemConfiguration.trackingType).toLong()
+    var lowColorChange by remember { mutableStateOf<ColorChange?>(null) }
+    var highColorChange by remember { mutableStateOf<ColorChange?>(null) }
 
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -411,7 +414,13 @@ fun UpsertConfigurationContent(
         Text(text = stringResource(R.string.low_color), modifier = Modifier.weight(1f))
         ColorTextField(
             color = itemConfiguration.lowColor ?: MaterialTheme.colorScheme.error,
-            onColorChange = { onChange(itemConfiguration.copy(lowColorArgb = it.toArgb())) },
+            onColorChange = {
+                when (it) {
+                    is ColorChange.Complete -> onChange(itemConfiguration.copy(lowColorArgb = it.color.toArgb()))
+                    ColorChange.Incomplete -> {}
+                }
+                lowColorChange = it
+            },
             modifier = Modifier.weight(1f),
         )
     }
@@ -425,7 +434,13 @@ fun UpsertConfigurationContent(
         Text(text = stringResource(R.string.high_color), modifier = Modifier.weight(1f))
         ColorTextField(
             color = itemConfiguration.highColor ?: MaterialTheme.colorScheme.primary,
-            onColorChange = { onChange(itemConfiguration.copy(highColorArgb = it.toArgb())) },
+            onColorChange = {
+                when (it) {
+                    is ColorChange.Complete -> onChange(itemConfiguration.copy(highColorArgb = it.color.toArgb()))
+                    ColorChange.Incomplete -> {}
+                }
+                highColorChange = it
+            },
             modifier = Modifier.weight(1f),
         )
     }
@@ -444,7 +459,7 @@ fun UpsertConfigurationContent(
         }
     }
     Button(
-        enabled = !disableSave && itemConfiguration.name.isNotBlank(),
+        enabled = !disableSave && itemConfiguration.name.isNotBlank() && lowColorChange !is ColorChange.Incomplete && highColorChange !is ColorChange.Incomplete,
         onClick = onSave,
         modifier = Modifier
             .fillMaxWidth()
@@ -457,18 +472,27 @@ fun UpsertConfigurationContent(
     }
 }
 
+sealed interface ColorChange {
+    data class Complete(val color: Color) : ColorChange
+    object Incomplete : ColorChange
+}
+
 @Composable
 private fun ColorTextField(
     color: Color,
-    onColorChange: (c: Color) -> Unit,
+    onColorChange: (c: ColorChange) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var textColor by remember { mutableStateOf(color.toHexString()) }
 
     LaunchedEffect(key1 = textColor) {
-        try {
-            onColorChange(Color("#$textColor".toColorInt()))
-        } catch (_: Exception) { }
+        onColorChange(
+            try {
+                ColorChange.Complete(Color("#$textColor".toColorInt()))
+            } catch (_: Exception) {
+                ColorChange.Incomplete
+            },
+        )
     }
 
     LaunchedEffect(key1 = color) {
@@ -478,7 +502,7 @@ private fun ColorTextField(
     OutlinedTextField(
         value = textColor,
         onValueChange = { textColor = it.uppercase().take(6) },
-        modifier = modifier,
+        modifier = modifier.onFocusChanged { if (!it.isFocused) textColor = color.toHexString() },
         prefix = { Text(text = stringResource(R.string.hex_prefix)) },
         trailingIcon = {
             Box(
