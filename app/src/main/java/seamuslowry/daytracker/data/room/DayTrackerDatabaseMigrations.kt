@@ -29,3 +29,10 @@ val MIGRATION_7_8: Migration = object : Migration(7, 8) {
         )
     }
 }
+
+val MIGRATION_8_9: Migration = object : Migration(8, 9) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE Item_Configuration ADD COLUMN highColorArgb INTEGER;")
+        db.execSQL("ALTER TABLE Item_Configuration ADD COLUMN lowColorArgb INTEGER;")
+    }
+}
