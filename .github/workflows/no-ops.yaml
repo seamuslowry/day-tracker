@@ -1,0 +1,14 @@
+name: No-Ops
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'README.md'
+      - '.github/**'
+
+jobs:
+  ensure-new-version:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Only non-source files changed — version bump not required."
