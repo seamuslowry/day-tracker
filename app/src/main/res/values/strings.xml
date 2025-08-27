@@ -5,7 +5,7 @@
     <string name="report">Report</string>
     <string name="settings">Settings</string>
     <string name="confirm_configuration">Save</string>
-    <string name="discard_configuration">Discard tracker configuration</string>
+    <string name="discard_configuration">Discard tracker configuration test</string>
     <string name="name">Name</string>
     <string name="change_tracking_type">Change to %1$s tracking type</string>
     <string name="no_more_tracking_types">No more tracking types</string>
