@@ -3,10 +3,9 @@ name: No-Ops
 on:
   pull_request:
     branches: [main]
-    paths:
-      - '**'
-      - '!app/**'
-      - '!*gradle*'
+    paths-ignore:
+      - 'app/**'
+      - '*gradle*'
 
 jobs:
   ensure-new-version:
