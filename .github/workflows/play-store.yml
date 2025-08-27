@@ -2,6 +2,9 @@ name: Play Store
 
 on:
   push:
+    paths-ignore:
+      - 'README.md'
+      - '.github/**'
 
 jobs:
   play-store:

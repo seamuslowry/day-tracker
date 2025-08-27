@@ -12,3 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo "Only non-source files changed — version bump not required."
+  play-store:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Only non-source files changed — play store release not required."
