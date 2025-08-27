@@ -4,8 +4,8 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - 'README.md'
-      - '.github/**'
+      - '!app/**'
+      - '!*gradle*'
 
 jobs:
   ensure-new-version:
