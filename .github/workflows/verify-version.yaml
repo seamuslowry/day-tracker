@@ -17,14 +17,14 @@ jobs:
           java-version: 17
 
       # target versions
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ github.base_ref }}
       - run: echo "version-name=$(./gradlew --no-daemon -q printVersionName)" >> "$GITHUB_OUTPUT"
         id: target-version-name
 
       # source versions
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ github.head_ref }}
       - run: echo "version-name=$(./gradlew --no-daemon -q printVersionName)" >> "$GITHUB_OUTPUT"
