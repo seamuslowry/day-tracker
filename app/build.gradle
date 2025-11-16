@@ -20,16 +20,20 @@ spotless {
     }
 }
 
+kotlin {
+    jvmToolchain(21)
+}
+
 android {
     namespace 'seamuslowry.daytracker'
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
         applicationId "seamuslowry.daytracker"
         minSdk 33
-        targetSdk 35
-        versionCode 59
-        versionName "0.31.21"
+        targetSdk 36
+        versionCode 60
+        versionName "0.32.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary true
@@ -45,11 +49,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = '17'
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
     buildFeatures {
         compose true
