@@ -57,7 +57,7 @@ jobs:
           ANDROID_JSON_KEY_FILE: ${{ steps.service_account_json_file.outputs.filePath }}
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: release_aab
           path: |
