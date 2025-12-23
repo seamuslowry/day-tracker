@@ -1,9 +1,11 @@
 package seamuslowry.daytracker.ui.shared
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -34,6 +36,7 @@ fun TrackerEntry(
             SingleChoiceSegmentedButtonRow(
                 modifier = modifier
                     .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState(Int.MAX_VALUE))
                     .defaultMinSize(minHeight = OutlinedTextFieldDefaults.MinHeight),
             ) {
                 trackerType.options.forEachIndexed { index, option ->
