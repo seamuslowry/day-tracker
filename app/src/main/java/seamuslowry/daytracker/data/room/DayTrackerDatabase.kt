@@ -12,6 +12,5 @@ import seamuslowry.daytracker.models.ItemConfiguration
 @TypeConverters(Converters::class)
 abstract class DayTrackerDatabase : RoomDatabase() {
     abstract fun itemDao(): ItemDao
-
     abstract fun itemConfigurationDao(): ItemConfigurationDao
 }

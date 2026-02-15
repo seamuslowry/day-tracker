@@ -31,133 +31,97 @@ import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
-class ReportViewModel
-    @Inject
-    constructor(
-        itemRepo: ItemRepo,
-        settingsRepo: SettingsRepo,
-    ) : ViewModel() {
-        var state = MutableStateFlow(ReportState())
-            private set
+class ReportViewModel @Inject constructor(
+    itemRepo: ItemRepo,
+    settingsRepo: SettingsRepo,
+) : ViewModel() {
+    var state = MutableStateFlow(ReportState())
+        private set
 
-        private val showRecordedValues: StateFlow<Boolean> =
-            settingsRepo.settings
-                .map {
-                    it.showRecordedValues
-                }.stateIn(
-                    scope = viewModelScope,
-                    initialValue = runBlocking { settingsRepo.settings.first().showRecordedValues },
-                    started = SharingStarted.WhileSubscribed(5_000),
-                )
+    private val showRecordedValues: StateFlow<Boolean> = settingsRepo.settings.map {
+        it.showRecordedValues
+    }.stateIn(
+        scope = viewModelScope,
+        initialValue = runBlocking { settingsRepo.settings.first().showRecordedValues },
+        started = SharingStarted.WhileSubscribed(5_000),
+    )
 
-        val colorOverrides: StateFlow<DisplayColors> =
-            settingsRepo.settings
-                .map {
-                    DisplayColors(it.lowValueColor, it.highValueColor)
-                }.stateIn(
-                    scope = viewModelScope,
-                    initialValue = runBlocking { settingsRepo.settings.first().let { DisplayColors(it.lowValueColor, it.highValueColor) } },
-                    started = SharingStarted.WhileSubscribed(5_000),
-                )
+    val colorOverrides: StateFlow<DisplayColors> = settingsRepo.settings.map {
+        DisplayColors(it.lowValueColor, it.highValueColor)
+    }.stateIn(
+        scope = viewModelScope,
+        initialValue = runBlocking { settingsRepo.settings.first().let { DisplayColors(it.lowValueColor, it.highValueColor) } },
+        started = SharingStarted.WhileSubscribed(5_000),
+    )
 
-        val earliestDate: StateFlow<LocalDate> =
-            itemRepo
-                .getEarliest()
-                .stateIn(
-                    scope = viewModelScope,
-                    started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                    initialValue = LocalDate.now(),
-                )
+    val earliestDate: StateFlow<LocalDate> = itemRepo.getEarliest()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+            initialValue = LocalDate.now(),
+        )
 
-        @OptIn(ExperimentalCoroutinesApi::class)
-        private val items: Flow<Map<ItemConfiguration, List<Item>>> =
-            state
-                .flatMapLatest {
-                    itemRepo.getFull(it.dateRange.start, it.dateRange.endInclusive)
-                }.map {
-                    it
-                        .groupBy(
-                            keySelector = { itemWithConfiguration -> itemWithConfiguration.configuration },
-                            valueTransform = { itemWithConfiguration -> itemWithConfiguration.item },
-                        ).toSortedMap()
-                }
-
-        val displayItems: StateFlow<Map<ItemConfiguration, List<List<DateDisplay>>>> =
-            combine(state, items, showRecordedValues) { s, i, srv ->
-                val dayOfWeekField = WeekFields.of(Locale.getDefault()).dayOfWeek()
-                val range = s.dateRange.start.range(dayOfWeekField)
-                val blanksFrom = s.dateRange.start.with(dayOfWeekField, range.minimum)
-                val blanksTo = s.dateRange.endInclusive.with(dayOfWeekField, range.maximum)
-                val baseDate = DateDisplay(showValue = srv, date = s.anchorDate)
-
-                val startingBlanks =
-                    List(ChronoUnit.DAYS.between(blanksFrom, s.dateRange.start).toInt()) {
-                        baseDate.copy(
-                            date =
-                                s.dateRange.start.minusDays(it.toLong() + 1),
-                            inRange = false,
-                        )
-                    }.reversed()
-                val endingBlanks =
-                    List(ChronoUnit.DAYS.between(s.dateRange.endInclusive, blanksTo).toInt()) {
-                        baseDate.copy(
-                            date =
-                                s.dateRange.endInclusive.plusDays(it.toLong() + 1),
-                            inRange = false,
-                        )
-                    }
-
-                val sequence = generateSequence(s.dateRange.start) { it.plusDays(1) }.takeWhile { it <= s.dateRange.endInclusive }
-
-                i
-                    .filterKeys { it.trackingType is LimitedOptionTrackingType }
-                    .mapValues { entry ->
-                        val sequenceDisplays =
-                            sequence
-                                .map { date ->
-                                    entry.value.firstOrNull { item -> item.date == date }?.let { item ->
-                                        val trackingType = entry.key.trackingType as LimitedOptionTrackingType
-                                        val selection = trackingType.options.firstOrNull { it.value == item.value }
-                                        baseDate.copy(
-                                            value = item.value,
-                                            text = selection?.shortText,
-                                            maxValue = trackingType.options.size,
-                                            date = date,
-                                        )
-                                    } ?: baseDate.copy(date = date)
-                                }.toList()
-
-                        (startingBlanks + sequenceDisplays + endingBlanks).chunked(range.maximum.toInt())
-                    }
-            }.stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = emptyMap(),
-            )
-
-        fun select(option: DisplayOption) {
-            state.value = state.value.copy(selectedOption = option)
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val items: Flow<Map<ItemConfiguration, List<Item>>> = state
+        .flatMapLatest {
+            itemRepo.getFull(it.dateRange.start, it.dateRange.endInclusive)
+        }
+        .map {
+            it.groupBy(
+                keySelector = { itemWithConfiguration -> itemWithConfiguration.configuration },
+                valueTransform = { itemWithConfiguration -> itemWithConfiguration.item },
+            ).toSortedMap()
         }
 
-        fun increment() {
-            state.value = state.value.copy(anchorDate = state.value.anchorDate.plus(1, state.value.selectedOption.unit))
-        }
+    val displayItems: StateFlow<Map<ItemConfiguration, List<List<DateDisplay>>>> = combine(state, items, showRecordedValues) { s, i, srv ->
+        val dayOfWeekField = WeekFields.of(Locale.getDefault()).dayOfWeek()
+        val range = s.dateRange.start.range(dayOfWeekField)
+        val blanksFrom = s.dateRange.start.with(dayOfWeekField, range.minimum)
+        val blanksTo = s.dateRange.endInclusive.with(dayOfWeekField, range.maximum)
+        val baseDate = DateDisplay(showValue = srv, date = s.anchorDate)
 
-        fun decrement() {
-            state.value = state.value.copy(anchorDate = state.value.anchorDate.minus(1, state.value.selectedOption.unit))
-        }
+        val startingBlanks = List(ChronoUnit.DAYS.between(blanksFrom, s.dateRange.start).toInt()) { baseDate.copy(date = s.dateRange.start.minusDays(it.toLong() + 1), inRange = false) }.reversed()
+        val endingBlanks = List(ChronoUnit.DAYS.between(s.dateRange.endInclusive, blanksTo).toInt()) { baseDate.copy(date = s.dateRange.endInclusive.plusDays(it.toLong() + 1), inRange = false) }
 
-        companion object {
-            private const val TIMEOUT_MILLIS = 5_000L
-        }
+        val sequence = generateSequence(s.dateRange.start) { it.plusDays(1) }.takeWhile { it <= s.dateRange.endInclusive }
+
+        i
+            .filterKeys { it.trackingType is LimitedOptionTrackingType }
+            .mapValues { entry ->
+                val sequenceDisplays = sequence.map { date ->
+                    entry.value.firstOrNull { item -> item.date == date }?.let { item ->
+                        val trackingType = entry.key.trackingType as LimitedOptionTrackingType
+                        val selection = trackingType.options.firstOrNull { it.value == item.value }
+                        baseDate.copy(value = item.value, text = selection?.shortText, maxValue = trackingType.options.size, date = date)
+                    } ?: baseDate.copy(date = date)
+                }.toList()
+
+                (startingBlanks + sequenceDisplays + endingBlanks).chunked(range.maximum.toInt())
+            }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+        initialValue = emptyMap(),
+    )
+
+    fun select(option: DisplayOption) {
+        state.value = state.value.copy(selectedOption = option)
     }
 
-enum class DisplayOption(
-    @StringRes val label: Int,
-    @StringRes val singular: Int,
-    val field: (locale: Locale) -> TemporalField,
-    val unit: ChronoUnit,
-) {
+    fun increment() {
+        state.value = state.value.copy(anchorDate = state.value.anchorDate.plus(1, state.value.selectedOption.unit))
+    }
+
+    fun decrement() {
+        state.value = state.value.copy(anchorDate = state.value.anchorDate.minus(1, state.value.selectedOption.unit))
+    }
+
+    companion object {
+        private const val TIMEOUT_MILLIS = 5_000L
+    }
+}
+
+enum class DisplayOption(@StringRes val label: Int, @StringRes val singular: Int, val field: (locale: Locale) -> TemporalField, val unit: ChronoUnit) {
     MONTH(R.string.display_month, R.string.month, { ChronoField.DAY_OF_MONTH }, ChronoUnit.MONTHS),
     WEEK(R.string.display_week, R.string.week, { WeekFields.of(it).dayOfWeek() }, ChronoUnit.WEEKS),
 }

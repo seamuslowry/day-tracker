@@ -70,16 +70,17 @@ import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import java.time.LocalDate
 
-val SUPPORTED_TRACKING_TYPES =
-    listOf(
-        LimitedOptionTrackingType.ONE_TO_TEN,
-        LimitedOptionTrackingType.YES_NO,
-        TextEntryTrackingType,
-    )
+val SUPPORTED_TRACKING_TYPES = listOf(
+    LimitedOptionTrackingType.ONE_TO_TEN,
+    LimitedOptionTrackingType.YES_NO,
+    TextEntryTrackingType,
+)
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun EntryScreen(viewModel: EntryViewModel = hiltViewModel()) {
+fun EntryScreen(
+    viewModel: EntryViewModel = hiltViewModel(),
+) {
     val itemsLoading by viewModel.itemsLoading.collectAsState()
     val state = viewModel.state
     val date by viewModel.date.collectAsState()
@@ -87,16 +88,15 @@ fun EntryScreen(viewModel: EntryViewModel = hiltViewModel()) {
     val items = state.items
 
     val lazyColumnState = rememberLazyListState()
-    val reorderableLazyColumnState =
-        rememberReorderableLazyListState(
-            lazyListState = lazyColumnState,
-            scrollThresholdPadding = WindowInsets.systemBars.asPaddingValues(),
-        ) { from, to ->
-            val fromElement = items.find { it.item.id == from.key } ?: return@rememberReorderableLazyListState
-            val toElement = items.find { it.item.id == to.key } ?: return@rememberReorderableLazyListState
+    val reorderableLazyColumnState = rememberReorderableLazyListState(
+        lazyListState = lazyColumnState,
+        scrollThresholdPadding = WindowInsets.systemBars.asPaddingValues(),
+    ) { from, to ->
+        val fromElement = items.find { it.item.id == from.key } ?: return@rememberReorderableLazyListState
+        val toElement = items.find { it.item.id == to.key } ?: return@rememberReorderableLazyListState
 
-            viewModel.swap(fromElement.configuration, toElement.configuration)
-        }
+        viewModel.swap(fromElement.configuration, toElement.configuration)
+    }
 
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -107,11 +107,10 @@ fun EntryScreen(viewModel: EntryViewModel = hiltViewModel()) {
             ArrowPicker(
                 value = date.toEpochDay(),
                 onChange = { viewModel.changeDate(LocalDate.ofEpochDay(it)) },
-                range =
-                    LongRange(
-                        LocalDate.now().minusYears(1).toEpochDay(),
-                        LocalDate.now().toEpochDay(),
-                    ),
+                range = LongRange(
+                    LocalDate.now().minusYears(1).toEpochDay(),
+                    LocalDate.now().toEpochDay(),
+                ),
                 incrementLabel = stringResource(R.string.change_date, date.plusDays(1).localeFormat()),
                 decrementLabel = stringResource(R.string.change_date, date.minusDays(1).localeFormat()),
             ) {
@@ -172,14 +171,14 @@ fun ItemEntry(
     Card(
         onClick = {},
         interactionSource = interactionSource,
-        modifier =
-            modifier
-                .padding(horizontal = 20.dp, vertical = 10.dp)
-                .placeholder(
-                    visible = itemWithConfiguration == null,
-                    highlight = PlaceholderHighlight.fade(),
-                    color = CardDefaults.cardColors().containerColor,
-                ).animateContentSize(),
+        modifier = modifier
+            .padding(horizontal = 20.dp, vertical = 10.dp)
+            .placeholder(
+                visible = itemWithConfiguration == null,
+                highlight = PlaceholderHighlight.fade(),
+                color = CardDefaults.cardColors().containerColor,
+            )
+            .animateContentSize(),
     ) {
         editingConfiguration?.let {
             UpsertConfigurationContent(
@@ -193,18 +192,14 @@ fun ItemEntry(
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(start = 25.dp, top = 10.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 25.dp, top = 10.dp),
             ) {
                 Text(text = configuration.name.ifEmpty { stringResource(R.string.default_name) })
                 ItemEntryMenu(onEvent = {
                     when (it) {
-                        ItemEntryMenuAction.DELETE -> {
-                            onDelete(configuration)
-                        }
-
+                        ItemEntryMenuAction.DELETE -> onDelete(configuration)
                         ItemEntryMenuAction.EDIT -> {
                             editingConfiguration = configuration
                         }
@@ -327,20 +322,18 @@ fun AddConfigurationButton(
 
     Box(
         contentAlignment = Alignment.TopCenter,
-        modifier =
-            modifier
-                .padding(20.dp)
-                .fillMaxWidth(),
+        modifier = modifier
+            .padding(20.dp)
+            .fillMaxWidth(),
     ) {
         Card(
             colors = CardDefaults.cardColors(containerColor = cardColor),
             modifier = Modifier.clip(RoundedCornerShape(corner)),
         ) {
             Column(
-                modifier =
-                    Modifier.animateContentSize(
-                        animationSpec = tween(durationMillis = mainDuration),
-                    ),
+                modifier = Modifier.animateContentSize(
+                    animationSpec = tween(durationMillis = mainDuration),
+                ),
             ) {
                 if (itemConfiguration == null) {
                     TextButton(
@@ -389,10 +382,9 @@ fun UpsertConfigurationContent(
         OutlinedTextField(
             value = itemConfiguration.name,
             onValueChange = { onChange(itemConfiguration.copy(name = it)) },
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .padding(end = 5.dp),
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 5.dp),
             label = { Text(text = stringResource(R.string.name)) },
         )
         IconButton(onClick = onDiscard) {
@@ -407,26 +399,10 @@ fun UpsertConfigurationContent(
         onChange = {
             onChange(itemConfiguration.copy(trackingType = SUPPORTED_TRACKING_TYPES[it.toInt()]))
         },
-        range =
-            if (creating) {
-                LongRange(
-                    0,
-                    (SUPPORTED_TRACKING_TYPES.size - 1).toLong(),
-                )
-            } else {
-                LongRange(currentTrackingTypeIndex, currentTrackingTypeIndex)
-            },
+        range = if (creating) LongRange(0, (SUPPORTED_TRACKING_TYPES.size - 1).toLong()) else LongRange(currentTrackingTypeIndex, currentTrackingTypeIndex),
         modifier = Modifier.padding(5.dp),
-        incrementLabel =
-            SUPPORTED_TRACKING_TYPES.getOrNull(currentTrackingTypeIndex.toInt() + 1)?.let {
-                stringResource(R.string.change_tracking_type, stringResource(it.label))
-            }
-                ?: stringResource(R.string.no_more_tracking_types),
-        decrementLabel =
-            SUPPORTED_TRACKING_TYPES.getOrNull(currentTrackingTypeIndex.toInt() - 1)?.let {
-                stringResource(R.string.change_tracking_type, stringResource(it.label))
-            }
-                ?: stringResource(R.string.no_more_tracking_types),
+        incrementLabel = SUPPORTED_TRACKING_TYPES.getOrNull(currentTrackingTypeIndex.toInt() + 1)?.let { stringResource(R.string.change_tracking_type, stringResource(it.label)) } ?: stringResource(R.string.no_more_tracking_types),
+        decrementLabel = SUPPORTED_TRACKING_TYPES.getOrNull(currentTrackingTypeIndex.toInt() - 1)?.let { stringResource(R.string.change_tracking_type, stringResource(it.label)) } ?: stringResource(R.string.no_more_tracking_types),
     ) {
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             TrackerEntry(trackerType = SUPPORTED_TRACKING_TYPES[it.toInt()], enabled = false)
@@ -435,10 +411,9 @@ fun UpsertConfigurationContent(
     Button(
         enabled = !disableSave && itemConfiguration.name.isNotBlank(),
         onClick = onSave,
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
     ) {
         Text(
             text = stringResource(R.string.confirm_configuration),

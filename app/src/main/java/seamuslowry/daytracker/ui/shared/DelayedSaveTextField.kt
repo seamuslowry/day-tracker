@@ -31,9 +31,8 @@ fun DelayedSaveTextField(
         placeholder = placeholder,
         onValueChange = { text = it },
         modifier = modifier,
-        keyboardOptions =
-            KeyboardOptions.Default.copy(
-                capitalization = KeyboardCapitalization.Sentences,
-            ),
+        keyboardOptions = KeyboardOptions.Default.copy(
+            capitalization = KeyboardCapitalization.Sentences,
+        ),
     )
 }

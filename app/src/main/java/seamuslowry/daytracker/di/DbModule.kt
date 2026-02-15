@@ -21,18 +21,21 @@ object DbModule {
     @Singleton
     fun provideDayTrackerDb(
         @ApplicationContext context: Context,
-    ): DayTrackerDatabase =
-        Room
-            .databaseBuilder(context, DayTrackerDatabase::class.java, "day_tracker_database")
-            .addMigrations(MIGRATION_6_7)
-            .addMigrations(MIGRATION_7_8)
-            .build()
+    ): DayTrackerDatabase = Room
+        .databaseBuilder(context, DayTrackerDatabase::class.java, "day_tracker_database")
+        .addMigrations(MIGRATION_6_7)
+        .addMigrations(MIGRATION_7_8)
+        .build()
 
     @Provides
     @Singleton
-    fun provideItemDao(db: DayTrackerDatabase): ItemDao = db.itemDao()
+    fun provideItemDao(
+        db: DayTrackerDatabase,
+    ): ItemDao = db.itemDao()
 
     @Provides
     @Singleton
-    fun provideItemConfigurationDao(db: DayTrackerDatabase): ItemConfigurationDao = db.itemConfigurationDao()
+    fun provideItemConfigurationDao(
+        db: DayTrackerDatabase,
+    ): ItemConfigurationDao = db.itemConfigurationDao()
 }

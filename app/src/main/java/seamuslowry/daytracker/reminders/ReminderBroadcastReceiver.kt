@@ -30,11 +30,7 @@ class ReminderBroadcastReceiver : BroadcastReceiver() {
     @Inject lateinit var itemRepo: ItemRepo
 
     @Inject lateinit var itemConfigurationRepo: ItemConfigurationRepo
-
-    override fun onReceive(
-        context: Context?,
-        intent: Intent?,
-    ) {
+    override fun onReceive(context: Context?, intent: Intent?) {
         Log.d(TAG, "Entering reminder broadcast receiver")
         context ?: return
 
@@ -46,20 +42,8 @@ class ReminderBroadcastReceiver : BroadcastReceiver() {
             Log.d(TAG, "Entering reminder broadcast receiver coroutine scope")
 
             val date = LocalDate.now()
-            val completedConfigurationIds =
-                itemRepo
-                    .get(date)
-                    .firstOrNull()
-                    ?.filter { it.value != null }
-                    ?.map { it.configuration }
-                    ?.toSet() ?: setOf()
-            val notifiableItemConfigurationIds =
-                itemConfigurationRepo
-                    .getAll()
-                    .firstOrNull()
-                    ?.filter { it.trackingType.notify }
-                    ?.map { it.id }
-                    ?.toSet() ?: setOf()
+            val completedConfigurationIds = itemRepo.get(date).firstOrNull()?.filter { it.value != null }?.map { it.configuration }?.toSet() ?: setOf()
+            val notifiableItemConfigurationIds = itemConfigurationRepo.getAll().firstOrNull()?.filter { it.trackingType.notify }?.map { it.id }?.toSet() ?: setOf()
             Log.d(
                 TAG,
                 "Determining reminder for $date with notifiable configuration items $notifiableItemConfigurationIds and completed configurations $completedConfigurationIds",
@@ -80,25 +64,22 @@ class ReminderBroadcastReceiver : BroadcastReceiver() {
 
         // Prepare the intent for notification click action
         val intent = Intent(context, MainActivity::class.java)
-        val pendingIntent: PendingIntent =
-            PendingIntent.getActivity(
-                context,
-                REQUEST_CODE,
-                intent,
-                PendingIntent.FLAG_IMMUTABLE,
-            )
+        val pendingIntent: PendingIntent = PendingIntent.getActivity(
+            context,
+            REQUEST_CODE,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE,
+        )
 
         // Create the notification
-        val builder =
-            NotificationCompat
-                .Builder(context, NOTIFICATION_CHANNEL)
-                .setSmallIcon(android.R.drawable.ic_popup_reminder)
-                .setContentTitle(context.getString(R.string.reminder_notification_title))
-                .setContentText(context.getString(R.string.reminder_notification_desc))
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(pendingIntent)
-                .setVisibility(VISIBILITY_PUBLIC)
-                .setAutoCancel(true)
+        val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)
+            .setSmallIcon(android.R.drawable.ic_popup_reminder)
+            .setContentTitle(context.getString(R.string.reminder_notification_title))
+            .setContentText(context.getString(R.string.reminder_notification_desc))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(pendingIntent)
+            .setVisibility(VISIBILITY_PUBLIC)
+            .setAutoCancel(true)
 
         // Show the notification
         with(NotificationManagerCompat.from(context)) {

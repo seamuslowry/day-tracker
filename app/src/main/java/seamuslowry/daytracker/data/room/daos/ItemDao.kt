@@ -20,10 +20,7 @@ interface ItemDao {
 
     @Transaction
     @Query("select * from item where date >= :min and date <= :max")
-    fun getFull(
-        min: LocalDate,
-        max: LocalDate,
-    ): Flow<List<ItemWithConfiguration>>
+    fun getFull(min: LocalDate, max: LocalDate): Flow<List<ItemWithConfiguration>>
 
     @Query("select * from item where date = :date")
     fun get(date: LocalDate): Flow<List<Item>>

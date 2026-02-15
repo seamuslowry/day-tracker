@@ -44,9 +44,7 @@ fun <T> ArrowPicker(
             transitionSpec = {
                 val inModifier = compare(targetState, initialState).sign
                 val outModifier = -inModifier
-                slideInHorizontally { height -> height * inModifier } + fadeIn() togetherWith
-                    slideOutHorizontally { height -> height * outModifier } + fadeOut() using
-                    SizeTransform(clip = false)
+                slideInHorizontally { height -> height * inModifier } + fadeIn() togetherWith slideOutHorizontally { height -> height * outModifier } + fadeOut() using SizeTransform(clip = false)
             },
             label = "arrowPickerContent",
         ) { targetType ->

@@ -22,10 +22,7 @@ class RescheduleReminderBroadcastReceiver : BroadcastReceiver() {
     lateinit var scheduler: Scheduler
 
     @SuppressLint("UnsafeProtectedBroadcastReceiver")
-    override fun onReceive(
-        context: Context?,
-        intent: Intent?,
-    ) {
+    override fun onReceive(context: Context?, intent: Intent?) {
         Log.d(TAG, "Entering reschedule reminder broadcast receiver")
         context ?: return
 

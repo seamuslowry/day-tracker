@@ -26,18 +26,12 @@ import seamuslowry.daytracker.ui.screens.report.ReportScreen
 import seamuslowry.daytracker.ui.screens.settings.SettingsScreen
 import java.time.LocalDate
 
-sealed class Screen<DataType>(
-    val identifier: String,
-    private val defaultData: DataType?,
-) {
+sealed class Screen<DataType>(val identifier: String, private val defaultData: DataType?) {
     data object Entry : Screen<Long>("entry", LocalDate.now().toEpochDay()) {
         const val INITIAL_DATE = "initialDate"
-
         override fun route(data: Long?) = "$identifier?$INITIAL_DATE=${data ?: "{$INITIAL_DATE}"}"
     }
-
     data object Report : Screen<Unit>("report", Unit)
-
     data object Settings : Screen<Unit>("settings", Unit)
 
     open fun route(data: DataType? = defaultData) = identifier
@@ -55,19 +49,13 @@ fun Navigation(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
 ) {
-    val currentRoute =
-        navController
-            .currentBackStackEntryAsState()
-            .value
-            ?.destination
-            ?.route
+    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
 
-    val navigableScreens =
-        listOf(
-            NavBarData(Screen.Entry, Icons.AutoMirrored.Filled.Assignment, stringResource(R.string.entry)),
-            NavBarData(Screen.Report, Icons.Filled.DateRange, stringResource(R.string.report)),
-            NavBarData(Screen.Settings, Icons.Filled.Settings, stringResource(R.string.settings)),
-        )
+    val navigableScreens = listOf(
+        NavBarData(Screen.Entry, Icons.AutoMirrored.Filled.Assignment, stringResource(R.string.entry)),
+        NavBarData(Screen.Report, Icons.Filled.DateRange, stringResource(R.string.report)),
+        NavBarData(Screen.Settings, Icons.Filled.Settings, stringResource(R.string.settings)),
+    )
 
     Scaffold(
         modifier = modifier,
@@ -98,13 +86,12 @@ fun Navigation(
         ) {
             composable(
                 Screen.Entry.route(null),
-                arguments =
-                    listOf(
-                        navArgument(Screen.Entry.INITIAL_DATE) {
-                            type = NavType.LongType
-                            defaultValue = LocalDate.now().toEpochDay()
-                        },
-                    ),
+                arguments = listOf(
+                    navArgument(Screen.Entry.INITIAL_DATE) {
+                        type = NavType.LongType
+                        defaultValue = LocalDate.now().toEpochDay()
+                    },
+                ),
             ) {
                 EntryScreen()
             }
