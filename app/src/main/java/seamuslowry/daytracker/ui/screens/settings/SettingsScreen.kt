@@ -53,9 +53,7 @@ import seamuslowry.daytracker.models.toHexString
 import java.time.LocalTime
 
 @Composable
-fun SettingsScreen(
-    viewModel: SettingsViewModel = hiltViewModel(),
-) {
+fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsState()
 
     val scope = rememberCoroutineScope()
@@ -64,9 +62,10 @@ fun SettingsScreen(
     val defaultLowColor = MaterialTheme.colorScheme.error
 
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(20.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
         verticalArrangement = Arrangement.SpaceAround,
     ) {
         ReminderSection(
@@ -100,16 +99,29 @@ fun CalendarSection(
 ) {
     val showRecordedValuesText = stringResource(R.string.show_recorded_values)
     Column(modifier = modifier) {
-        Text(text = stringResource(R.string.calendar_section_title), modifier = Modifier.padding(vertical = 8.dp), style = MaterialTheme.typography.headlineSmall)
+        Text(
+            text = stringResource(R.string.calendar_section_title),
+            modifier = Modifier.padding(vertical = 8.dp),
+            style = MaterialTheme.typography.headlineSmall,
+        )
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 4.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(text = showRecordedValuesText)
-            Switch(checked = showValues, onCheckedChange = onSetShowValues, modifier = Modifier.semantics { contentDescription = showRecordedValuesText })
+            Switch(
+                checked = showValues,
+                onCheckedChange = onSetShowValues,
+                modifier =
+                    Modifier.semantics {
+                        contentDescription =
+                            showRecordedValuesText
+                    },
+            )
         }
     }
 }
@@ -122,10 +134,11 @@ fun ReminderSection(
     onSetReminderTime: (time: LocalTime) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = onSetReminderEnabled,
-    )
+    val launcher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+            onResult = onSetReminderEnabled,
+        )
     var pickingTime by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val requiredPermission = Manifest.permission.POST_NOTIFICATIONS
@@ -140,19 +153,29 @@ fun ReminderSection(
     Column(modifier = modifier) {
         Text(text = remindersText, modifier = Modifier.padding(vertical = 8.dp), style = MaterialTheme.typography.headlineSmall)
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 4.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(text = stringResource(R.string.enabled))
-            Switch(checked = reminderEnabled, onCheckedChange = onSetReminderEnabled, modifier = Modifier.semantics { contentDescription = remindersText })
+            Switch(
+                checked = reminderEnabled,
+                onCheckedChange = onSetReminderEnabled,
+                modifier =
+                    Modifier.semantics {
+                        contentDescription =
+                            remindersText
+                    },
+            )
         }
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 4.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
@@ -186,8 +209,9 @@ fun ColorSection(
 ) {
     Column(modifier = modifier) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier =
+                Modifier
+                    .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
@@ -203,9 +227,10 @@ fun ColorSection(
             }
         }
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 4.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
@@ -213,9 +238,10 @@ fun ColorSection(
             ColorTextField(color = lowColor, onColorChange = onSetLowColor, modifier = Modifier.weight(1f))
         }
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 4.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
@@ -236,7 +262,8 @@ private fun ColorTextField(
     LaunchedEffect(key1 = textColor) {
         try {
             onColorChange(Color(parseColor("#$textColor")))
-        } catch (_: Exception) { }
+        } catch (_: Exception) {
+        }
     }
 
     LaunchedEffect(key1 = color) {
@@ -250,17 +277,17 @@ private fun ColorTextField(
         prefix = { Text(text = stringResource(R.string.hex_prefix)) },
         trailingIcon = {
             Box(
-                modifier = Modifier
-                    .size(24.dp)
-                    .background(
-                        color = if (color.toHexString() == textColor) color else Color.Unspecified,
-                        shape = CircleShape,
-                    )
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.outline,
-                        shape = CircleShape,
-                    ),
+                modifier =
+                    Modifier
+                        .size(24.dp)
+                        .background(
+                            color = if (color.toHexString() == textColor) color else Color.Unspecified,
+                            shape = CircleShape,
+                        ).border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.outline,
+                            shape = CircleShape,
+                        ),
             )
         },
     )

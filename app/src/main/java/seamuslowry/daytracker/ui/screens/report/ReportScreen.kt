@@ -71,11 +71,12 @@ fun ReportScreen(
             decrementLabel = stringResource(R.string.see_previous, selectedOptionSingularText),
         ) {
             Text(
-                text = stringResource(
-                    id = R.string.date_range,
-                    it.start.localeFormat(),
-                    it.endInclusive.localeFormat(),
-                ),
+                text =
+                    stringResource(
+                        id = R.string.date_range,
+                        it.start.localeFormat(),
+                        it.endInclusive.localeFormat(),
+                    ),
                 textAlign = TextAlign.Center,
             )
         }
@@ -106,7 +107,9 @@ fun DisplaySelection(
 ) {
     FlowRow(modifier = modifier, horizontalArrangement = Arrangement.Center) {
         DisplayOption.entries.forEach {
-            FilterChip(selected = selected == it, modifier = Modifier.padding(horizontal = 4.dp), onClick = { onSelect(it) }, label = { Text(text = stringResource(it.label)) })
+            FilterChip(selected = selected == it, modifier = Modifier.padding(horizontal = 4.dp), onClick = {
+                onSelect(it)
+            }, label = { Text(text = stringResource(it.label)) })
         }
     }
 }
@@ -120,10 +123,11 @@ fun DisplayDates(
 ) {
     Card(modifier = modifier) {
         Column(
-            modifier = Modifier
-                .animateContentSize(animationSpec = tween(300))
-                .fillMaxWidth()
-                .padding(8.dp),
+            modifier =
+                Modifier
+                    .animateContentSize(animationSpec = tween(300))
+                    .fillMaxWidth()
+                    .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
@@ -133,17 +137,19 @@ fun DisplayDates(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
                 horizontalArrangement = Arrangement.Center,
             ) {
                 entry.value.first().forEach {
                     Text(
-                        text = it.date.dayOfWeek.getDisplayName(
-                            TextStyle.SHORT,
-                            Locale.getDefault(),
-                        ),
+                        text =
+                            it.date.dayOfWeek.getDisplayName(
+                                TextStyle.SHORT,
+                                Locale.getDefault(),
+                            ),
                         textAlign = TextAlign.Center,
                         modifier = Modifier.weight(1f),
                         style = MaterialTheme.typography.bodySmall,
@@ -177,68 +183,85 @@ fun DisplayDate(
     val lowColor = colorOverrides.lowValueColor ?: MaterialTheme.colorScheme.error
     val highColor = colorOverrides.highValueColor ?: MaterialTheme.colorScheme.primary
 
-    val color = when {
-        !date.inRange -> Color.Transparent
-        date.value == null || date.maxValue == null -> Color.Transparent
-        else -> Color(ArgbEvaluator().evaluate(date.value.toFloat().div(date.maxValue), lowColor.toArgb(), highColor.toArgb()) as Int)
-    }
+    val color =
+        when {
+            !date.inRange -> Color.Transparent
+            date.value == null || date.maxValue == null -> Color.Transparent
+            else -> Color(ArgbEvaluator().evaluate(date.value.toFloat().div(date.maxValue), lowColor.toArgb(), highColor.toArgb()) as Int)
+        }
 
-    val textAlpha = when {
-        !date.inRange -> 0.5f
-        else -> 1f
-    }
+    val textAlpha =
+        when {
+            !date.inRange -> 0.5f
+            else -> 1f
+        }
 
-    val textColor = when {
-        color == Color.Transparent -> MaterialTheme.colorScheme.onBackground
-        ColorUtils.calculateContrast(MaterialTheme.colorScheme.onPrimary.toArgb(), color.toArgb()) > 2.5f -> MaterialTheme.colorScheme.onPrimary
-        ColorUtils.calculateContrast(MaterialTheme.colorScheme.onError.toArgb(), color.toArgb()) > 2.5f -> MaterialTheme.colorScheme.onError
-        else -> MaterialTheme.colorScheme.onBackground
-    }
+    val textColor =
+        when {
+            color == Color.Transparent -> MaterialTheme.colorScheme.onBackground
 
-    val value = when {
-        date.text != null -> stringResource(date.text)
-        date.value != null -> date.value.toString()
-        else -> null
-    }
+            ColorUtils.calculateContrast(
+                MaterialTheme.colorScheme.onPrimary.toArgb(),
+                color.toArgb(),
+            ) > 2.5f -> MaterialTheme.colorScheme.onPrimary
 
-    val smallText = when {
-        date.showValue -> date.date.dayOfMonth.toString()
-        else -> null
-    }
+            ColorUtils.calculateContrast(
+                MaterialTheme.colorScheme.onError.toArgb(),
+                color.toArgb(),
+            ) > 2.5f -> MaterialTheme.colorScheme.onError
 
-    val largeText = when {
-        date.showValue -> value
-        else -> date.date.dayOfMonth.toString()
-    }
+            else -> MaterialTheme.colorScheme.onBackground
+        }
+
+    val value =
+        when {
+            date.text != null -> stringResource(date.text)
+            date.value != null -> date.value.toString()
+            else -> null
+        }
+
+    val smallText =
+        when {
+            date.showValue -> date.date.dayOfMonth.toString()
+            else -> null
+        }
+
+    val largeText =
+        when {
+            date.showValue -> value
+            else -> date.date.dayOfMonth.toString()
+        }
 
     BoxWithConstraints(
         contentAlignment = Alignment.Center,
-        modifier = modifier
-            .background(color)
-            .fillMaxHeight()
-            .semantics {
-                contentDescription = date.date.localeFormat()
-            }
-            .clickable(
-                enabled = date.date <= LocalDate.now(),
-                onClick = onSelectDate,
-            ),
+        modifier =
+            modifier
+                .background(color)
+                .fillMaxHeight()
+                .semantics {
+                    contentDescription = date.date.localeFormat()
+                }.clickable(
+                    enabled = date.date <= LocalDate.now(),
+                    onClick = onSelectDate,
+                ),
     ) {
         // specifically allowing this because Caroline likes her phone supporting date displays this small
         val enoughSpaceToLookNice = maxHeight >= 35.dp
-        val (smallTextAlignment, largeTextAlignment) = Pair(
-            if (enoughSpaceToLookNice) Alignment.TopStart else Alignment.TopCenter,
-            if (smallText == null || enoughSpaceToLookNice) Alignment.Center else Alignment.BottomCenter,
-        )
+        val (smallTextAlignment, largeTextAlignment) =
+            Pair(
+                if (enoughSpaceToLookNice) Alignment.TopStart else Alignment.TopCenter,
+                if (smallText == null || enoughSpaceToLookNice) Alignment.Center else Alignment.BottomCenter,
+            )
 
         if (smallText != null) {
             Text(
                 text = smallText,
                 color = textColor,
-                modifier = Modifier
-                    .align(smallTextAlignment)
-                    .alpha(textAlpha)
-                    .padding(horizontal = 4.dp),
+                modifier =
+                    Modifier
+                        .align(smallTextAlignment)
+                        .alpha(textAlpha)
+                        .padding(horizontal = 4.dp),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.ExtraLight,
@@ -248,9 +271,10 @@ fun DisplayDate(
             Text(
                 text = largeText,
                 color = textColor,
-                modifier = Modifier
-                    .alpha(textAlpha)
-                    .align(largeTextAlignment),
+                modifier =
+                    Modifier
+                        .alpha(textAlpha)
+                        .align(largeTextAlignment),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Light,

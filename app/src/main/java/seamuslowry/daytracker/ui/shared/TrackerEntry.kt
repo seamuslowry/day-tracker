@@ -30,11 +30,12 @@ fun TrackerEntry(
     enabled: Boolean = true,
 ) {
     when (trackerType) {
-        is LimitedOptionTrackingType ->
+        is LimitedOptionTrackingType -> {
             SingleChoiceSegmentedButtonRow(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .defaultMinSize(minHeight = OutlinedTextFieldDefaults.MinHeight),
+                modifier =
+                    modifier
+                        .fillMaxWidth()
+                        .defaultMinSize(minHeight = OutlinedTextFieldDefaults.MinHeight),
             ) {
                 trackerType.options.forEachIndexed { index, option ->
                     SegmentedButton(
@@ -42,31 +43,34 @@ fun TrackerEntry(
                         selected = option.value == item?.value,
                         icon = {},
                         onClick = { item?.let { onChange(it.copy(value = option.value)) } },
-                        shape = SegmentedButtonDefaults.itemShape(
-                            index = index,
-                            count = trackerType.options.size,
-                        ),
-                        colors = SegmentedButtonDefaults.colors(
-                            // active buttons use the default button colors
-                            activeContainerColor = ButtonDefaults.buttonColors().containerColor,
-                            activeContentColor = ButtonDefaults.buttonColors().contentColor,
-                            disabledActiveContainerColor = ButtonDefaults.buttonColors().disabledContainerColor,
-                            disabledActiveContentColor = ButtonDefaults.buttonColors().disabledContentColor,
-                            // inactive buttons use the default outlined button colors
-                            inactiveContainerColor = ButtonDefaults.outlinedButtonColors().containerColor,
-                            inactiveContentColor = ButtonDefaults.outlinedButtonColors().contentColor,
-                            disabledInactiveContainerColor = ButtonDefaults.outlinedButtonColors().disabledContainerColor,
-                            disabledInactiveContentColor = ButtonDefaults.outlinedButtonColors().disabledContentColor,
-                            // all borders use outline
-                            activeBorderColor = MaterialTheme.colorScheme.outline,
-                            inactiveBorderColor = MaterialTheme.colorScheme.outline,
-                            disabledActiveBorderColor = MaterialTheme.colorScheme.outline,
-                            disabledInactiveBorderColor = MaterialTheme.colorScheme.outline,
-                        ),
+                        shape =
+                            SegmentedButtonDefaults.itemShape(
+                                index = index,
+                                count = trackerType.options.size,
+                            ),
+                        colors =
+                            SegmentedButtonDefaults.colors(
+                                // active buttons use the default button colors
+                                activeContainerColor = ButtonDefaults.buttonColors().containerColor,
+                                activeContentColor = ButtonDefaults.buttonColors().contentColor,
+                                disabledActiveContainerColor = ButtonDefaults.buttonColors().disabledContainerColor,
+                                disabledActiveContentColor = ButtonDefaults.buttonColors().disabledContentColor,
+                                // inactive buttons use the default outlined button colors
+                                inactiveContainerColor = ButtonDefaults.outlinedButtonColors().containerColor,
+                                inactiveContentColor = ButtonDefaults.outlinedButtonColors().contentColor,
+                                disabledInactiveContainerColor = ButtonDefaults.outlinedButtonColors().disabledContainerColor,
+                                disabledInactiveContentColor = ButtonDefaults.outlinedButtonColors().disabledContentColor,
+                                // all borders use outline
+                                activeBorderColor = MaterialTheme.colorScheme.outline,
+                                inactiveBorderColor = MaterialTheme.colorScheme.outline,
+                                disabledActiveBorderColor = MaterialTheme.colorScheme.outline,
+                                disabledInactiveBorderColor = MaterialTheme.colorScheme.outline,
+                            ),
                     ) {
                         Text(
-                            text = option.text?.let { text -> stringResource(id = text) }
-                                ?: option.value.toString(),
+                            text =
+                                option.text?.let { text -> stringResource(id = text) }
+                                    ?: option.value.toString(),
                             softWrap = false,
                             modifier = Modifier.requiredWidth(IntrinsicSize.Max),
                             overflow = TextOverflow.Visible,
@@ -74,18 +78,23 @@ fun TrackerEntry(
                     }
                 }
             }
-        is TextEntryTrackingType -> DelayedSaveTextField(
-            onSave = { newText -> item?.let { onChange(it.copy(comment = newText, value = -1)) } },
-            value = item?.comment ?: "",
-            placeholder = {
-                Text(
-                    text = stringResource(
-                        R.string.text_tracker_placeholder,
-                    ),
-                )
-            },
-            modifier = modifier.fillMaxWidth(),
-            enabled = enabled,
-        )
+        }
+
+        is TextEntryTrackingType -> {
+            DelayedSaveTextField(
+                onSave = { newText -> item?.let { onChange(it.copy(comment = newText, value = -1)) } },
+                value = item?.comment ?: "",
+                placeholder = {
+                    Text(
+                        text =
+                            stringResource(
+                                R.string.text_tracker_placeholder,
+                            ),
+                    )
+                },
+                modifier = modifier.fillMaxWidth(),
+                enabled = enabled,
+            )
+        }
     }
 }

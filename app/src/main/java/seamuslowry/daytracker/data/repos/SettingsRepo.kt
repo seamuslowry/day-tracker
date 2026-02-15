@@ -18,70 +18,76 @@ import javax.inject.Inject
 
 private const val SETTINGS_STORE = "settingsStore"
 
-class SettingsRepo @Inject constructor(@ApplicationContext private val context: Context) {
-
-    private companion object {
-        private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = SETTINGS_STORE)
-        val REMINDER_ENABLED = booleanPreferencesKey("REMINDER_ENABLED_KEY")
-        val REMINDER_TIME = stringPreferencesKey("REMINDER_TIME")
-        val SHOW_RECORDED_VALUES = booleanPreferencesKey("SHOW_RECORDED_VALUES")
-        val LOW_VALUE_COLOR = intPreferencesKey("LOW_VALUE_COLOR")
-        val HIGH_VALUE_COLOR = intPreferencesKey("HIGH_VALUE_COLOR")
-    }
-
-    suspend fun setReminderEnabled(enabled: Boolean) {
-        context.dataStore.edit {
-            it[REMINDER_ENABLED] = enabled
+class SettingsRepo
+    @Inject
+    constructor(
+        @ApplicationContext private val context: Context,
+    ) {
+        private companion object {
+            private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = SETTINGS_STORE)
+            val REMINDER_ENABLED = booleanPreferencesKey("REMINDER_ENABLED_KEY")
+            val REMINDER_TIME = stringPreferencesKey("REMINDER_TIME")
+            val SHOW_RECORDED_VALUES = booleanPreferencesKey("SHOW_RECORDED_VALUES")
+            val LOW_VALUE_COLOR = intPreferencesKey("LOW_VALUE_COLOR")
+            val HIGH_VALUE_COLOR = intPreferencesKey("HIGH_VALUE_COLOR")
         }
-    }
 
-    suspend fun setReminderTime(time: LocalTime) {
-        context.dataStore.edit {
-            it[REMINDER_TIME] = time.toString()
+        suspend fun setReminderEnabled(enabled: Boolean) {
+            context.dataStore.edit {
+                it[REMINDER_ENABLED] = enabled
+            }
         }
-    }
 
-    suspend fun setShowRecordedValues(show: Boolean) {
-        context.dataStore.edit {
-            it[SHOW_RECORDED_VALUES] = show
+        suspend fun setReminderTime(time: LocalTime) {
+            context.dataStore.edit {
+                it[REMINDER_TIME] = time.toString()
+            }
         }
-    }
 
-    suspend fun setLowValueColor(color: Color) {
-        context.dataStore.edit {
-            it[LOW_VALUE_COLOR] = color.toArgb()
+        suspend fun setShowRecordedValues(show: Boolean) {
+            context.dataStore.edit {
+                it[SHOW_RECORDED_VALUES] = show
+            }
         }
-    }
 
-    suspend fun setHighValueColor(color: Color) {
-        context.dataStore.edit {
-            it[HIGH_VALUE_COLOR] = color.toArgb()
+        suspend fun setLowValueColor(color: Color) {
+            context.dataStore.edit {
+                it[LOW_VALUE_COLOR] = color.toArgb()
+            }
         }
-    }
 
-    val settings: Flow<Settings> = context.dataStore.data
-        .map {
-            Settings(
-                reminderEnabled = it[REMINDER_ENABLED] ?: false,
-                reminderTime = it[REMINDER_TIME]?.let { time -> LocalTime.parse(time) } ?: LocalTime.of(18, 0),
-                showRecordedValues = it[SHOW_RECORDED_VALUES] ?: false,
-                lowValueColor = it[LOW_VALUE_COLOR]?.let { colorInt ->
-                    try {
-                        Color(colorInt)
-                    } catch (e: Exception) {
-                        null
-                    }
-                },
-                highValueColor = it[HIGH_VALUE_COLOR]?.let { colorInt ->
-                    try {
-                        Color(colorInt)
-                    } catch (e: Exception) {
-                        null
-                    }
-                },
-            )
+        suspend fun setHighValueColor(color: Color) {
+            context.dataStore.edit {
+                it[HIGH_VALUE_COLOR] = color.toArgb()
+            }
         }
-}
+
+        val settings: Flow<Settings> =
+            context.dataStore.data
+                .map {
+                    Settings(
+                        reminderEnabled = it[REMINDER_ENABLED] ?: false,
+                        reminderTime = it[REMINDER_TIME]?.let { time -> LocalTime.parse(time) } ?: LocalTime.of(18, 0),
+                        showRecordedValues = it[SHOW_RECORDED_VALUES] ?: false,
+                        lowValueColor =
+                            it[LOW_VALUE_COLOR]?.let { colorInt ->
+                                try {
+                                    Color(colorInt)
+                                } catch (e: Exception) {
+                                    null
+                                }
+                            },
+                        highValueColor =
+                            it[HIGH_VALUE_COLOR]?.let { colorInt ->
+                                try {
+                                    Color(colorInt)
+                                } catch (e: Exception) {
+                                    null
+                                }
+                            },
+                    )
+                }
+    }
 
 data class Settings(
     val reminderEnabled: Boolean = false,

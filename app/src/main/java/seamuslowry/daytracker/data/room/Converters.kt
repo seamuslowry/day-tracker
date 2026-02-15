@@ -24,12 +24,13 @@ class Converters {
 
     // TrackingType conversions
     @TypeConverter
-    fun stringToTrackingType(value: String?): TrackingType? = when {
-        value == null -> null
-        LimitedOptionTrackingType.entries.any { it.name == value } -> LimitedOptionTrackingType.valueOf(value)
-        value == TextEntryTrackingType.toString() -> TextEntryTrackingType
-        else -> null
-    }
+    fun stringToTrackingType(value: String?): TrackingType? =
+        when {
+            value == null -> null
+            LimitedOptionTrackingType.entries.any { it.name == value } -> LimitedOptionTrackingType.valueOf(value)
+            value == TextEntryTrackingType.toString() -> TextEntryTrackingType
+            else -> null
+        }
 
     @TypeConverter
     fun trackingTypeToString(trackingType: TrackingType?): String? = trackingType?.toString()
