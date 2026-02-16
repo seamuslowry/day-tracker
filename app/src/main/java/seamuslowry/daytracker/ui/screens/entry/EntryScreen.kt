@@ -200,6 +200,7 @@ fun ItemEntry(
                 ItemEntryMenu(onEvent = {
                     when (it) {
                         ItemEntryMenuAction.DELETE -> onDelete(configuration)
+
                         ItemEntryMenuAction.EDIT -> {
                             editingConfiguration = configuration
                         }

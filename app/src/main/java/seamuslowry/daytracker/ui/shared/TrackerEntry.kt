@@ -74,6 +74,7 @@ fun TrackerEntry(
                     }
                 }
             }
+
         is TextEntryTrackingType -> DelayedSaveTextField(
             onSave = { newText -> item?.let { onChange(it.copy(comment = newText, value = -1)) } },
             value = item?.comment ?: "",
