@@ -4,6 +4,10 @@ on:
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - '**'
+      - '!app/**'
+      - '!*gradle*'
 
 jobs:
   ensure-new-version:
