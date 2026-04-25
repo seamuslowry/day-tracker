@@ -31,8 +31,8 @@ android {
         applicationId "seamuslowry.daytracker"
         minSdk 33
         targetSdk 36
-        versionCode 68
-        versionName "0.32.8"
+        versionCode 69
+        versionName "0.32.9"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary true
@@ -78,7 +78,7 @@ dependencies {
     implementation "androidx.room:room-ktx:$room_version"
     implementation "io.github.fornewid:placeholder-material3:2.0.0"
     implementation "androidx.datastore:datastore-preferences:1.2.1"
-    implementation 'sh.calvin.reorderable:reorderable:3.0.0'
+    implementation 'sh.calvin.reorderable:reorderable:3.1.0'
 
     ksp "androidx.room:room-compiler:$room_version"
     ksp "com.google.dagger:hilt-compiler:$hilt_version"
