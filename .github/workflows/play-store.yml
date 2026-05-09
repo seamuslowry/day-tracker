@@ -22,14 +22,14 @@ jobs:
           bundler-cache: true
 
       - name: Decode Service Account Key JSON File
-        uses: timheuer/base64-to-file@v1
+        uses: timheuer/base64-to-file@v2
         id: service_account_json_file
         with:
           fileName: "serviceAccount.json"
           encodedString: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
 
       - name: Decode Keystore File
-        uses: timheuer/base64-to-file@v1
+        uses: timheuer/base64-to-file@v2
         id: android_keystore
         with:
           fileName: "android_keystore.keystore"
