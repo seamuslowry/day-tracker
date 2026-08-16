@@ -25,14 +25,14 @@ kotlin {
 
 android {
     namespace 'seamuslowry.daytracker'
-    compileSdk 36
+    compileSdk 37
 
     defaultConfig {
         applicationId "seamuslowry.daytracker"
         minSdk 33
-        targetSdk 36
-        versionCode 69
-        versionName "0.32.9"
+        targetSdk 37
+        versionCode 70
+        versionName "0.32.10"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary true
@@ -69,11 +69,11 @@ dependencies {
     implementation "androidx.compose.ui:ui-tooling-preview"
     implementation 'androidx.compose.material:material-icons-extended'
     implementation "androidx.compose.material3:material3"
-    implementation 'androidx.core:core-ktx:1.18.0'
+    implementation 'androidx.core:core-ktx:1.19.0'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.10.0'
     implementation 'androidx.activity:activity-compose:1.13.0'
     implementation "com.google.dagger:hilt-android:$hilt_version"
-    implementation "androidx.hilt:hilt-navigation-compose:1.3.0"
+    implementation "androidx.hilt:hilt-navigation-compose:1.4.0"
     implementation "androidx.room:room-runtime:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
     implementation "io.github.fornewid:placeholder-material3:2.0.0"
