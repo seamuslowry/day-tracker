@@ -15,4 +15,4 @@ jobs:
           distribution: zulu
           java-version: 21
           cache: gradle
-      - run: ./gradlew spotlessCheck
+      - run: ./gradlew spotlessCheck lintDebug testDebugUnitTest
