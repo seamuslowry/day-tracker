@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -46,7 +47,6 @@ import seamuslowry.daytracker.models.localeFormat
 import seamuslowry.daytracker.ui.shared.ArrowPicker
 import java.time.LocalDate
 import java.time.format.TextStyle
-import java.util.Locale
 
 @Composable
 fun ReportScreen(
@@ -142,7 +142,7 @@ fun DisplayDates(
                     Text(
                         text = it.date.dayOfWeek.getDisplayName(
                             TextStyle.SHORT,
-                            Locale.getDefault(),
+                            LocalLocale.current.platformLocale,
                         ),
                         textAlign = TextAlign.Center,
                         modifier = Modifier.weight(1f),
