@@ -25,14 +25,18 @@ kotlin {
 
 android {
     namespace 'seamuslowry.daytracker'
-    compileSdk 37
+    compileSdk {
+        version = release(37) {
+            minorApiLevel = 1
+        }
+    }
 
     defaultConfig {
         applicationId "seamuslowry.daytracker"
         minSdk 33
         targetSdk 37
-        versionCode 86
-        versionName "0.32.26"
+        versionCode 88
+        versionName "0.32.28"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary true
